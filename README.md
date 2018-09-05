@@ -1,5 +1,5 @@
 # nbs-client-test
-
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/NBSChain/NBS-QML.svg?columns=all)](https://waffle.io/NBSChain/NBS-QML) 
 ## compile to jar command
 First make sure maven is properly installed
 command :
