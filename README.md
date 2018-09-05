@@ -23,3 +23,4 @@ ipfs pubsub peers bmJzaW8ubmV0
 ## Version 2.0.2
   - 增加文件下载功能
   -
+  sf
