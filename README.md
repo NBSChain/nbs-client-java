@@ -22,4 +22,4 @@ ipfs pubsub peers bmJzaW8ubmV0
   - 增加节点信息显示
 ## Version 2.0.2
   - 增加文件下载功能
-  -
+![git](https://github.com/NBSChain/nbs-client-java/blob/master/wiki/dist/cli-java-demo.gif?raw=true)
