@@ -22,4 +22,15 @@ ipfs pubsub peers bmJzaW8ubmV0
   - 增加节点信息显示
 ## Version 2.0.2
   - 增加文件下载功能
+  
+# Dapp 界面截图
+## 首页
+![index](https://github.com/NBSChain/nbs-client-java/blob/master/wiki/dist/cli4j.home.png?raw=true)
+## 群聊天界面
+![im](https://github.com/NBSChain/nbs-client-java/blob/master/wiki/dist/cli4j.im.png?raw=true)
+## 上传文件界面
+![files](https://github.com/NBSChain/nbs-client-java/blob/master/wiki/dist/cli4j.files.png?raw=true)
+## 在NBS网络搜索hash 界面
+![search](https://github.com/NBSChain/nbs-client-java/blob/master/wiki/dist/cli4j.search.png?raw=true)  
+## Dapp 动图
 ![git](https://github.com/NBSChain/nbs-client-java/blob/master/wiki/dist/cli-java-demo.gif?raw=true)
