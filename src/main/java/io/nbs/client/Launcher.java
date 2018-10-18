@@ -65,6 +65,7 @@ public class Launcher {
     private static ConfigurationHelper cfgHelper;
     private static boolean ipfsRuning = false;
     private static boolean cliStartFirst = true;
+    private String[] bootStrapParams;
 
     private IPFS ipfs;
     /**
