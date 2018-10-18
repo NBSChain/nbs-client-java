@@ -1,8 +1,5 @@
 package io.nbs.client;
 
-
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * @Package : UI
  * @Description :
@@ -15,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * All rights reserved.
  */
 public class App {
-    private static ConcurrentHashMap<String,String> SETTINGS = new ConcurrentHashMap<>();
+
     public static void main(String[] agrs){
-        Launcher launcher = new Launcher();
+        Launcher launcher = new Launcher(agrs);
         launcher.launch();
     }
 }

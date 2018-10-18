@@ -65,7 +65,7 @@ public class Launcher {
     private static ConfigurationHelper cfgHelper;
     private static boolean ipfsRuning = false;
     private static boolean cliStartFirst = true;
-    private String[] bootStrapParams;
+    public static AppSettings appSettings;
 
     private IPFS ipfs;
     /**
@@ -82,17 +82,13 @@ public class Launcher {
     }
 
     public Launcher(){
-        context = this;
-        logo = IconUtil.getIcon(this,"/icons/nbs.png");
-        cfgHelper = ConfigurationHelper.getInstance();
-
+        this(null);
     }
     public Launcher(String[] args){
         context = this;
-
-        /*if(args.length>0){
-
-        }*/
+        logo = IconUtil.getIcon(this,"/icons/nbs.png");
+        cfgHelper = ConfigurationHelper.getInstance();
+        appSettings = AppSettings.getInstance(args);
     }
 
 
