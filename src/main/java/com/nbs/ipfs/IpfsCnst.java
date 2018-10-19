@@ -10,7 +10,7 @@ package com.nbs.ipfs;
  */
 public class IpfsCnst {
 
-    public static final String M_KEY_PEER_ID = "ID";
+    public static final String MM_NODE_ID = "node.hash.id";
 
     /* --wrap-with-directory | -w */
     public final static String WRAP_WITH_DIRECTORY_KEY = "ipfs.key.wrap-with-directory";

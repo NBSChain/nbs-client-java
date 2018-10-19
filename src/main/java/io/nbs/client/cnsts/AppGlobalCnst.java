@@ -1,5 +1,7 @@
 package io.nbs.client.cnsts;
 
+import java.awt.*;
+
 /**
  * @Package : io.ipfs.nbs.cnsts
  * @Description : <p></p>
@@ -37,6 +39,8 @@ public class AppGlobalCnst {
      * 非NBS客户端区分
      */
     public static String NOTNBS_PEER_MIDDLE= "_NBSChain_";
+
+    public static Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
 
     /**
      * 构造路径

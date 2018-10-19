@@ -57,39 +57,11 @@ public class IPFSHelper {
         return IPFSHolder.instance;
     }
 
-    /**
-     *
-     * @return
-     */
-    public IPFS rebuild(){
-        ipfs = new IPFS(ConfigurationHelper.getInstance().getIPFSAddress());
-        return ipfs;
-    }
 
     public IPFS getIpfs() {
         return ipfs;
     }
 
-    public String generateNickName(){
-        String[] sources = new String[]{
-                "8","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
-                "a","b","c","d","e","f","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
-                "0","1","2","3","4","5","6","7","9","8"
-        };
-        StringBuffer nick = new StringBuffer();
-        nick.append("NBSChain_");
-        for(int i=0;i<6;i++){
-            int c = getRadom(sources.length);
-            if(c<0||c>sources.length)c = 1;
-            nick.append(sources[c-1]);
-        }
-        return nick.toString();
-    }
-
-
-    private int getRadom(int len){
-        return (int)Math.round(Math.random()*len);
-    }
 
     /**
      *

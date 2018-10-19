@@ -6,6 +6,7 @@ import io.nbs.client.listener.AbstractMouseListener;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.OSUtil;
+import io.nbs.client.ui.GUI4JHelper;
 import io.nbs.client.ui.components.GBC;
 import io.nbs.client.ui.components.NBSButton;
 import io.nbs.commons.helper.ConfigurationHelper;
@@ -131,25 +132,8 @@ public class FailFrame extends JFrame {
     }
 
     private void addListeners(){
-        closeLabel.addMouseListener(new AbstractMouseListener(){
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.exit(1);
-                super.mouseClicked(e);
-            }
+        GUI4JHelper.addWinCloseIconListener(closeLabel);
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                closeLabel.setBackground(ColorCnst.LIGHT_GRAY);
-                super.mouseEntered(e);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                closeLabel.setBackground(ColorCnst.WINDOW_BACKGROUND);
-                super.mouseExited(e);
-            }
-        });
         if(OSUtil.getOsType() != OSUtil.Mac_OS){
             addMouseListener(new MouseAdapter(){
                 @Override

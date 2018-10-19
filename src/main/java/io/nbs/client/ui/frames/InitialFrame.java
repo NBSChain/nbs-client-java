@@ -3,6 +3,7 @@ package io.nbs.client.ui.frames;
 import com.nbs.biz.PeersOperatorService;
 import com.nbs.biz.service.TableService;
 import io.ipfs.multibase.Base16;
+import io.nbs.client.ui.GUI4JHelper;
 import io.nbs.client.ui.components.VerticalFlowLayout;
 import io.nbs.client.listener.AbstractMouseListener;
 import io.ipfs.api.IPFS;
@@ -317,25 +318,7 @@ public class InitialFrame extends JFrame {
     }
 
     private void setListeners(){
-        closeLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                System.exit(1);
-                super.mouseClicked(e);
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                closeLabel.setBackground(ColorCnst.LIGHT_GRAY);
-                super.mouseEntered(e);
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                closeLabel.setBackground(ColorCnst.WINDOW_BACKGROUND);
-                super.mouseExited(e);
-            }
-        });
+        GUI4JHelper.addWinCloseIconListener(closeLabel);
 
         if (OSUtil.getOsType() != OSUtil.Mac_OS)
         {

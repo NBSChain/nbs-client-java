@@ -6,9 +6,9 @@ import io.ipfs.nbs.helper.IPAddressHelper;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
+import io.nbs.client.exceptions.AppInitializedException;
+import io.nbs.client.ui.frames.InitialDappFrame;
 import io.nbs.commons.helper.ConfigurationHelper;
-import io.nbs.commons.utils.Base64CodecUtil;
-import io.nbs.commons.utils.TimeUtil;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.frames.FailFrame;
 import io.nbs.client.ui.frames.InitialFrame;
@@ -59,13 +59,15 @@ public class Launcher {
      *
      */
     public static String userHome;
-    public static String CURRENT_DIR;
+    public static final String CURRENT_DIR;
     public static final String FILE_SEPARATOR;
     public static String DOWNLOAD_FILE_PATH;
     private static ConfigurationHelper cfgHelper;
     private static boolean ipfsRuning = false;
     private static boolean cliStartFirst = true;
     public static AppSettings appSettings;
+
+    public static final File temDir;
 
     private IPFS ipfs;
     /**
@@ -79,6 +81,7 @@ public class Launcher {
         sqlSession = DataBaseUtil.getSqlSession();
         CURRENT_DIR = System.getProperty("user.dir");
         FILE_SEPARATOR = System.getProperty("file.separator");
+        temDir = new File(CURRENT_DIR+FILE_SEPARATOR+".tmp");
     }
 
     public Launcher(){
@@ -87,6 +90,7 @@ public class Launcher {
     public Launcher(String[] args){
         context = this;
         logo = IconUtil.getIcon(this,"/icons/nbs.png");
+        currentPeer = new PeerInfo();
         cfgHelper = ConfigurationHelper.getInstance();
         appSettings = AppSettings.getInstance(args);
     }
@@ -97,37 +101,64 @@ public class Launcher {
          * 1.初始化目录
          */
         initialStartup();
+
+        boolean bootstrapOk = false;
+        String initMessage = "";
+        try {
+            bootstrapOk = appSettings.checkedBaseIPFSConfig();
+        }catch (AppInitializedException aie){
+            logger.warn(aie.getMessage());
+        }
         /**
          * 2.构建IPFS
          */
-        ipfs = null;
-
         try{
-            String apiURL = ConfigurationHelper.getInstance().getIPFSAddress();
-            ipfs =  new IPFS(apiURL);
-            checkedIPFSRunning();
-            if(ipfsRuning){
-                boolean first = needInitConfig(ipfs);
-                //first = true;
-                if(first){
-                    currentFrame = new InitialFrame(ipfs);
-                }else {
-                    currentFrame = new MainFrame(currentPeer);
-                    currentFrame.setVisible(true);
-                }
-            }else {
-                goFailFrame("您的 NBS 服务未启动,请检查.");
-            }
+            ipfs = new IPFS(appSettings.getHost(),appSettings.getApiPort());
+
+            bootstrapOk = true;
         }catch (RuntimeException re){
-            cliStartFirst =false;
-            re.printStackTrace();
-            System.out.println(re.getMessage());
-            goFailFrame("您的 NBS 服务未启动,请检查.");
-        } catch (IOException e) {
-            cliStartFirst =false;
-            logger.error(e.getMessage());
-            goFailFrame("未能获取服务配置信息,请检查IPFS 服务是否已启动.");
+
         }
+
+        if(!bootstrapOk){
+            //TODO goto InitialDappFrame
+            currentFrame = new InitialDappFrame();
+        }else {
+            //TODO goto MainFrame
+            if(currentPeer==null||StringUtils.isBlank(currentPeer.getId())){
+                currentFrame = new InitialDappFrame();
+            }else {
+                currentFrame = new MainFrame(currentPeer);
+            }
+        }
+
+
+//        try{
+//            String apiURL = ConfigurationHelper.getInstance().getIPFSAddress();
+//            ipfs =  new IPFS(apiURL);
+//            checkedIPFSRunning();
+//            if(ipfsRuning){
+//                boolean first = needInitConfig(ipfs);
+//                //first = true;
+//                if(first){
+//                    currentFrame = new InitialFrame(ipfs);
+//                }else {
+//                    currentFrame = new MainFrame(currentPeer);
+//                    currentFrame.setVisible(true);
+//                }
+//            }else {
+//                goFailFrame("您的 NBS 服务未启动,请检查.");
+//            }
+//        }catch (RuntimeException re){
+//            cliStartFirst =false;
+//            re.printStackTrace();
+//            System.out.println(re.getMessage());
+//            goFailFrame("您的 NBS 服务未启动,请检查.");
+//        } catch (IOException e) {
+//            cliStartFirst =false;
+//            logger.error(e.getMessage());
+//            goFailFrame("未能获取服务配置信息,请检查IPFS 服务是否已启动.");
+//        }
         currentFrame.setBackground(ColorCnst.WINDOW_BACKGROUND);
         currentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         if(OSUtil.getOsType()!=OSUtil.Mac_OS){
@@ -149,7 +180,7 @@ public class Launcher {
      */
     private void checkedIPFSRunning(){
         int checkTimes = 0;
-        while (!ipfsRuning&& checkTimes<20){
+        while (!ipfsRuning&& checkTimes<5){
             if(ipfs==null){
                 String apiURL = cfgHelper.getIPFSAddress();
                 try {
@@ -263,10 +294,12 @@ public class Launcher {
     private void initialStartup(){
         userHome = System.getProperty("user.home");
         appBasePath = CURRENT_DIR+FILE_SEPARATOR+AppGlobalCnst.NBS_ROOT;
+        if(!temDir.exists()){//临时文件
+            temDir.mkdirs();
+        }
         /**
          * 初始化目录
          */
-
         DOWNLOAD_FILE_PATH = AppGlobalCnst.consturactPath(userHome,AppGlobalCnst.NBS_ROOT);
         File userFile = new File(DOWNLOAD_FILE_PATH);
         if(!userFile.exists()){
@@ -277,7 +310,6 @@ public class Launcher {
             appBaseFile.mkdirs();
         }
 
-        File appTempFile = new File(CURRENT_DIR+FILE_SEPARATOR+AppGlobalCnst.TEMP_FILE);
         if(!appBaseFile.exists()){
             appBaseFile.mkdirs();
         }
@@ -385,5 +417,21 @@ public class Launcher {
 
     public static String getSysUser(){
         return System.getProperty("user.name","");
+    }
+
+    public void setIpfs(IPFS ipfs) {
+        this.ipfs = ipfs;
+    }
+
+    public PeerInfo getCurrentPeer() {
+        return currentPeer;
+    }
+
+    public static void setCurrentPeer(PeerInfo currentPeer) {
+        Launcher.currentPeer = currentPeer;
+    }
+
+    public void setCurrentFrame(JFrame currentFrame) {
+        this.currentFrame = currentFrame;
     }
 }
