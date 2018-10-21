@@ -8,6 +8,7 @@ import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.exceptions.AppInitializedException;
 import io.nbs.client.ui.frames.InitialDappFrame;
+import io.nbs.sdk.beans.NodeBase;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.frames.FailFrame;
 import io.nbs.client.ui.frames.InitialFrame;
@@ -16,6 +17,7 @@ import io.nbs.commons.utils.DataBaseUtil;
 import io.nbs.commons.utils.IconUtil;
 import io.nbs.sdk.constants.ConfigKeys;
 import io.nbs.sdk.prot.IPMParser;
+import io.nbs.sdk.prot.NodeDataConvertHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -112,10 +114,13 @@ public class Launcher {
          */
         try{
             ipfs = new IPFS(appSettings.getHost(),appSettings.getApiPort());
-
+            //构建CurrentPeer
+            buildPeerInfo(currentPeer,ipfs);
             bootstrapOk = true;
         }catch (RuntimeException re){
-
+            logger.warn("初始化IPFS 失败{}",re.getMessage());
+        }catch (IOException ioe){
+            logger.warn("初始化Peer 失败 {}",ioe.getMessage());
         }
 
         if(!bootstrapOk){
@@ -171,6 +176,24 @@ public class Launcher {
         sb.append(msg);
         sb.append("</html");
         currentFrame = new FailFrame(sb.toString());
+    }
+
+    private void buildPeerInfo(PeerInfo info,IPFS ipfs) throws IOException{
+        if(info==null)info = new PeerInfo();
+        Map data = ipfs.id();
+        NodeBase nodeBase = NodeDataConvertHelper.convertFormID(data);
+        if(nodeBase==null)throw new IOException("获取PeerID 失败.");
+        info.setId(nodeBase.getID());
+        Map cfgMap = ipfs.config.show();
+        if(cfgMap.containsKey(ConfigKeys.nickname.key()))
+            info.setNick(cfgMap.get(ConfigKeys.nickname.key()).toString());
+        if(cfgMap.containsKey(ConfigKeys.avatarHash.key()))
+            info.setAvatar(cfgMap.get(ConfigKeys.avatarHash.key()).toString());
+        if(cfgMap.containsKey(ConfigKeys.avatarName.key()))
+            info.setAvatarName(cfgMap.get(ConfigKeys.avatarName.key()).toString());
+        if(cfgMap.containsKey(ConfigKeys.avatarSuffix.key()))
+            info.setAvatarSuffix(cfgMap.get(ConfigKeys.avatarSuffix.key()).toString());
+
     }
 
     /**
