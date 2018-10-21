@@ -291,7 +291,7 @@ public class DappIPFSStepPanel extends JPanel {
                     updateDappConfMap();
                     DappBaseStepPanel.getContext().setIpfs(ipfs).loadNodeInfo();
                     InitialDappFrame.getContext().showStep(InitialDappFrame.InitDappSteps.setDapp);
-                }catch ( IPFSInitialException exception){
+                }catch (IPFSInitialException exception){
                     msg = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.connected.fail","Connected failure..");
                     logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),exception.getMessage());
                     setValidTip(0);

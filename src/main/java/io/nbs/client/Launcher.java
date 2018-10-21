@@ -8,13 +8,13 @@ import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.exceptions.AppInitializedException;
 import io.nbs.client.ui.frames.InitialDappFrame;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.frames.FailFrame;
 import io.nbs.client.ui.frames.InitialFrame;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.commons.utils.DataBaseUtil;
 import io.nbs.commons.utils.IconUtil;
+import io.nbs.sdk.constants.ConfigKeys;
 import io.nbs.sdk.prot.IPMParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -62,7 +62,6 @@ public class Launcher {
     public static final String CURRENT_DIR;
     public static final String FILE_SEPARATOR;
     public static String DOWNLOAD_FILE_PATH;
-    private static ConfigurationHelper cfgHelper;
     private static boolean ipfsRuning = false;
     private static boolean cliStartFirst = true;
     public static AppSettings appSettings;
@@ -91,7 +90,6 @@ public class Launcher {
         context = this;
         logo = IconUtil.getIcon(this,"/icons/nbs.png");
         currentPeer = new PeerInfo();
-        cfgHelper = ConfigurationHelper.getInstance();
         appSettings = AppSettings.getInstance(args);
     }
 
@@ -178,11 +176,12 @@ public class Launcher {
     /**
      *
      */
-    private void checkedIPFSRunning(){
+    private void checkedIPFSRunning() throws Exception{
         int checkTimes = 0;
         while (!ipfsRuning&& checkTimes<5){
             if(ipfs==null){
-                String apiURL = cfgHelper.getIPFSAddress();
+                String apiURL;
+                apiURL = appSettings.getAddressApiUrl();
                 try {
                     ipfs =  new IPFS(apiURL);
                 }catch (RuntimeException e){
@@ -213,9 +212,10 @@ public class Launcher {
 
     public void reStartMain(){
         //init IPFS and check
-        checkedIPFSRunning();
+
         boolean first = false;
         try {
+            checkedIPFSRunning();
             first = needInitConfig(ipfs);
             //first = true;
             if(first){
@@ -230,7 +230,7 @@ public class Launcher {
                 currentFrame.setIconImage(logo.getImage());
             }
             currentFrame.setVisible(true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
             destoryIPFS();
@@ -249,11 +249,11 @@ public class Launcher {
     private boolean needInitConfig(IPFS ipfs) throws IOException {
         Map cfg = ipfs.config.show();
         String peerid = (String)ipfs.id().get("ID");
-        if(cfg.containsKey(ConfigurationHelper.JSON_NICKNAME_KEY)
-                && cfg.containsKey(ConfigurationHelper.JSON_CFG_FROMID_KEY)){
-            Object nickObj = cfg.get(ConfigurationHelper.JSON_NICKNAME_KEY);
+        if(appSettings.containsKey(ConfigKeys.nickname.key())
+                && appSettings.containsKey(ConfigKeys.formid.key())){
+            Object nickObj = appSettings.getConfigVolme(ConfigKeys.nickname.key());
             String nick = IPMParser.urlDecode(nickObj.toString());
-            String fromid =  (String)cfg.get(ConfigurationHelper.JSON_CFG_FROMID_KEY);
+            String fromid =  (String)cfg.get(ConfigKeys.formid.key());
             if(StringUtils.isBlank(fromid)||StringUtils.isBlank(nick))return true;
             currentPeer = new PeerInfo();
             currentPeer.setId(peerid);
@@ -261,14 +261,14 @@ public class Launcher {
             //
             currentPeer.setFrom(fromid);
 
-            Object avatar = cfg.get(ConfigurationHelper.JSON_AVATAR_KEY);
-            Object avatarSuffix = cfg.get(ConfigurationHelper.JSON_AVATAR_SUFFIX_KEY);
+            Object avatar = appSettings.getConfigVolme(ConfigKeys.avatarHash.key());
+            Object avatarSuffix = appSettings.getConfigVolme(ConfigKeys.avatarSuffix.key());
             if(avatar!=null&&!avatar.toString().equals("")
                     &&avatarSuffix!=null&& !"".equals(avatarSuffix.toString())){
                 currentPeer.setAvatar(avatar.toString());
                 currentPeer.setAvatarSuffix(avatarSuffix.toString());
             }
-            Object avatarName = cfg.get(ConfigurationHelper.JSON_AVATAR_NAME_KEY);
+            Object avatarName = appSettings.getConfigVolme(ConfigKeys.avatarName.key());
             if(avatarName!=null){
                 String avatarFileName = IPMParser.urlDecode(avatarName.toString());
                 currentPeer.setAvatarName(avatarFileName);
@@ -287,6 +287,8 @@ public class Launcher {
             return true;
         }
     }
+
+
 
     /**
      * 启动初始化
@@ -327,9 +329,8 @@ public class Launcher {
 
     public IPFS getIpfs() {
         if(ipfs ==null){
-            String apiURL = ConfigurationHelper.getInstance().getIPFSAddress();
             try{
-                ipfs =  new IPFS(apiURL);
+                ipfs =  new IPFS(appSettings.getHost(),appSettings.getApiPort());
             }catch (RuntimeException e){
                 logger.error("未能链接上IPFS服务，请检查服务是否已停止.");
             }
@@ -406,7 +407,7 @@ public class Launcher {
      * 退出时同时结束IPFS服务
      */
     public static void destoryIPFS(){
-        if(ipfsProcess!=null && cfgHelper.exitStopIPFS()){
+        if(ipfsProcess!=null && appSettings.getStatus("nbs.server.exit.stop")){
             ipfsProcess.destroy();
         }
     }

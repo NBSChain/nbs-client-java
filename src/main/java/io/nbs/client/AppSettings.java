@@ -229,6 +229,10 @@ public class AppSettings {
         return this;
     }
 
+    public boolean containsKey(String key){
+        return SETTINGS.containsKey(key);
+    }
+
     private static String getProperty(String key){
         if(!props.containsKey(key))return null;
         String vlaue = props.getProperty(key);
@@ -334,10 +338,10 @@ public class AppSettings {
         if(!RegexUtils.checkIPv4Address(host))throw new AppInitializedException(
                 getConfigVolme("app.bootstrap.warn.host.msg","host config format error.")
         );
-        if(!SETTINGS.containsKey(IpfsCnst.MM_GATEWAY_PROTOCOL_KEY))throw new AppInitializedException(
+        if(!SETTINGS.containsKey(IpfsCnst.MM_GATEWAY_PORT_KEY))throw new AppInitializedException(
                 getConfigVolme("app.bootstrap.warn.gateway.port.msg","not found api port config.")
         );
-        port = SETTINGS.get(IpfsCnst.MM_GATEWAY_PROTOCOL_KEY);
+        port = SETTINGS.get(IpfsCnst.MM_GATEWAY_PORT_KEY);
         if(!RegexUtils.checkPort(port))throw new AppInitializedException(
                 getConfigVolme("app.bootstrap.warn.gateway.port.msg","api port config format error.")
         );
@@ -414,5 +418,29 @@ public class AppSettings {
     public int getGatewayPort(){
         String apiPort = SETTINGS.get(IpfsCnst.MM_GATEWAY_PORT_KEY);
         return Integer.parseInt(apiPort);
+    }
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/21
+     * @Description  :
+     * 是否开启
+     */
+    public boolean subWorldPeers(){
+        String enabledSunWorldPeers = getConfigVolme("nbs.client.im.topic.subworld","false");
+        if(enabledSunWorldPeers.equalsIgnoreCase("true") || enabledSunWorldPeers.equals("1")
+                ||enabledSunWorldPeers.equalsIgnoreCase("enabled"))return true;
+        return false;
+    }
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/21
+     * @Description  :
+     * 
+     */
+    public boolean getStatus(String key){
+        String enabledSunWorldPeers = getConfigVolme(key,"false");
+        if(enabledSunWorldPeers.equalsIgnoreCase("true") || enabledSunWorldPeers.equals("1")
+                ||enabledSunWorldPeers.equalsIgnoreCase("enabled"))return true;
+        return false;
     }
 }

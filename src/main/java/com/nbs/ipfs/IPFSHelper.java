@@ -1,8 +1,9 @@
 package com.nbs.ipfs;
 
+import io.nbs.client.Launcher;
 import io.nbs.commons.utils.Base64CodecUtil;
 import io.ipfs.api.IPFS;
-import io.nbs.commons.helper.ConfigurationHelper;
+import io.nbs.sdk.constants.ConfigKeys;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class IPFSHelper {
     public static final String NBSWORLD_IMS_TOPIC = Base64CodecUtil.encode("nbsio.net");
 
     public IPFSHelper() {
-        ipfs = new IPFS(ConfigurationHelper.getInstance().getIPFSAddress());
+        ipfs = new IPFS(Launcher.appSettings.getHost(),Launcher.appSettings.getApiPort());
         try {
             Map m = ipfs.id();
             secMap.putAll(m);
@@ -72,7 +73,7 @@ public class IPFSHelper {
     public String updateNick(String nick) throws IOException {
         if(ipfs==null||StringUtils.isBlank(nick))return null;
         nick = nick.trim();
-        ipfs.config.set(ConfigurationHelper.JSON_NICKNAME_KEY,nick);
+        ipfs.config.set(ConfigKeys.nickname.key(),nick);
         return nick;
     }
 

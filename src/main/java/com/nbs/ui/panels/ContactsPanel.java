@@ -1,17 +1,16 @@
 package com.nbs.ui.panels;
 
 import UI.AppMainWindow;
-import UI.panel.im.IMPanel;
 import com.alibaba.fastjson.JSON;
 import com.nbs.biz.model.ContactsEntity;
 import com.nbs.biz.service.ContactsService;
+import io.nbs.client.Launcher;
 import io.nbs.client.services.IpfsMessageSender;
 import io.nbs.client.vo.ContactsItem;
 import com.nbs.entity.PeerBoradcastInfo;
 import com.nbs.entity.PeerInfoBase;
 import com.nbs.ipfs.IPFSHelper;
 import com.nbs.ipfs.entity.IpfsMessage;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.commons.helper.DateHelper;
 import io.nbs.client.adapter.ContactsItemAdapter;
 import io.nbs.client.cnsts.ColorCnst;
@@ -154,7 +153,7 @@ public class ContactsPanel extends ParentAvailablePanel {
 
         try {
             Object obj = null;
-            if(ConfigurationHelper.getInstance().subWorldPeers()){
+            if(Launcher.appSettings.subWorldPeers()){
                 obj = ipfs.pubsub.peers(IpfsMessageSender.NBSWORLD_IMS_TOPIC);
             }else {
                 obj = ipfs.pubsub.peers();
@@ -200,7 +199,7 @@ public class ContactsPanel extends ParentAvailablePanel {
 
         new Thread(()->{
             logger.warn(DateHelper.currentTime()+">>>>>>>启动订阅 NBSWorld..."+IPFSHelper.NBSWORLD_IMS_TOPIC);
-            IPFS ipfs = new IPFS(ConfigurationHelper.getInstance().getIPFSAddress());
+            IPFS ipfs = new IPFS(Launcher.appSettings.getHost(),Launcher.appSettings.getApiPort());
 
             while (true){
                 try {

@@ -7,6 +7,7 @@ import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
+import io.nbs.client.exceptions.AppInitializedException;
 import io.nbs.client.helper.AvatarImageHandler;
 import io.nbs.client.listener.AbstractMouseListener;
 import io.nbs.client.ui.components.GBC;
@@ -62,24 +63,24 @@ public class DappBaseStepPanel extends JPanel {
 
     private JPanel          buttonPanel;
     private NBSButton       prevButton;
-    private NBSButton saveButton;
+    private NBSButton       saveButton;
     private NBSButton       cancelButton;
 
-    private NBSButton avatarButton;
+    private NBSButton       avatarButton;
 
 
-    private JLabel statusLabel;
-    private JPanel statusPanel;
-    private JLabel avatarLabel;
+    private JLabel          statusLabel;
+    private JPanel          statusPanel;
+    private JLabel          avatarLabel;
 
-    private String avatarName = null;
-    private String nick = null;
-    private String avatar = null;
-    private String id;
+    private String          avatarName = null;
+    private String          nick = null;
+    private String          avatar = null;
+    private String          id;
 
-    private IPFS ipfs;
+    private IPFS            ipfs;
 
-    private JFileChooser fileChooser;
+    private JFileChooser    fileChooser;
 
     /**
      * 头像处理工具类
@@ -379,6 +380,7 @@ public class DappBaseStepPanel extends JPanel {
 
         if(selectedFile != null){
             //独立线程处理上传下载
+
             new Thread(()->{
                 File dlAvatar ;
                 List<MerkleNode> nodes;
@@ -391,9 +393,10 @@ public class DappBaseStepPanel extends JPanel {
                     nodes = ipfs.add(fileWrapper);
                     avatar = nodes.get(0).hash.toBase58();
                     avatarName = selectedFile.getName();
+                    String baseGwURL = Launcher.appSettings.getAddressGatewayBaseUrl();
 
                     //下载头像
-                    dlAvatar = downloadAvatar(avatar);
+                    dlAvatar = downloadAvatar(baseGwURL,avatar);
                     ImageIcon icon = imageHandler.getImageIconFromOrigin(dlAvatar,128);
 
                     if(null != icon){
@@ -435,14 +438,21 @@ public class DappBaseStepPanel extends JPanel {
         statusLabel.updateUI();
     }
 
-    private File downloadAvatar(String hash) throws Exception{
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/21
+     * @Description  :下载头像
+     *
+     */
+    private File downloadAvatar(String baseGwURL,String hash) throws Exception{
         String path ;
         URL url;
         File avatarFile;
-        path = Launcher.appSettings.getGatewayURL(hash);
+        path = baseGwURL + hash;
         url = new URL(path);
         String filePath = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),hash+AvatarImageHandler.AVATAR_SUFFIX);
         avatarFile = new File(filePath);
+        if(avatarFile.exists())return avatarFile;
         boolean b = imageHandler.getFileFromIPFS(url,avatarFile);
         return avatarFile;
     }
@@ -468,11 +478,12 @@ public class DappBaseStepPanel extends JPanel {
             }
             if(cfgMap.containsKey(ConfigKeys.avatarHash.key())){
                 avatar = cfgMap.get(ConfigKeys.avatarHash.key()).toString();
+                String baseGwURL = Launcher.appSettings.getAddressGatewayBaseUrl();
                 new Thread(()->{
                     //独立线程 加载头像
                     File dlAvatar ;
                     try{
-                        dlAvatar = downloadAvatar(avatar);
+                        dlAvatar = downloadAvatar(baseGwURL,avatar);
                         ImageIcon icon = imageHandler.getImageIconFromOrigin(dlAvatar,128);
                         if(null != icon){
                             avatarLabel.setIcon(icon);
@@ -484,7 +495,7 @@ public class DappBaseStepPanel extends JPanel {
             }
             if(cfgMap.containsKey(ConfigKeys.avatarName.key()))avatarName = cfgMap.get(ConfigKeys.avatarName.key()).toString();
             fillInfo(nodeBase,nick);
-        }catch (IOException e){
+        }catch (IOException | AppInitializedException e){
             logger.warn(e.getMessage(),e.getCause());
         }
     }
