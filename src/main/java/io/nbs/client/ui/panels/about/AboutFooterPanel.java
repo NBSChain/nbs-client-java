@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.about;
 
+import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.frames.MainFrame;
@@ -83,7 +84,7 @@ public class AboutFooterPanel extends ParentAvailablePanel {
             public void mouseEntered(MouseEvent e) {
                 super.mouseEntered(e);
                 e.getComponent().setForeground(ColorCnst.FONT_URL_BLUE);
-                e.getComponent().setCursor(MainFrame.handCursor);
+                e.getComponent().setCursor(AppGlobalCnst.HAND_CURSOR);
             }
 
             @Override

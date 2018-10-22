@@ -101,7 +101,6 @@ public class MainFrame extends JFrame {
 
     private AboutMasterPanel aboutMasterPanel;
 
-    public static Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
 
     public MainFrame(PeerInfo peerInfo){
         context = this;
@@ -223,6 +222,9 @@ public class MainFrame extends JFrame {
      * @param clType
      */
     public void mainWinShow(MainCardLayoutTypes clType){
+        if(clType!=MainCardLayoutTypes.MEDIA){
+            this.mediaMasterPanel.destoryPlatform();
+        }
         cardLayout.show(mainCentetPanel,clType.name());
     }
     /**
@@ -312,4 +314,11 @@ public class MainFrame extends JFrame {
         INFO_REFREHING = false;
     }
 
+    public void loadMedia(String hash){
+        if(this.mediaMasterPanel!=null)this.mediaMasterPanel.loadHash(hash);
+    }
+
+    public MediaMasterPanel getMediaMasterPanel() {
+        return mediaMasterPanel;
+    }
 }

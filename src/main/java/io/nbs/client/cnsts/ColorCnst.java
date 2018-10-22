@@ -1,5 +1,7 @@
 package io.nbs.client.cnsts;
 
+import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 /**
@@ -11,6 +13,7 @@ import java.awt.*;
  * All rights reserved.
  */
 public class ColorCnst {
+    public static final Border RED_BORDER =  BorderFactory.createLineBorder (Color.RED,1);
     public static final Color RED = new Color(228, 74, 47);
     public static final Color FONT_MAIN = new Color(51,51,51);
     public static final Color FONT_BLACK = new Color(0,0,0);

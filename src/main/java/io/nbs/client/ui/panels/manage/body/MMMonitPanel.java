@@ -7,6 +7,7 @@ import io.ipfs.api.beans.bw.BitSwap;
 import io.ipfs.api.bitswap.BitSwapService;
 import io.ipfs.multihash.Multihash;
 import io.nbs.client.Launcher;
+import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.components.LCJlabel;
@@ -303,7 +304,7 @@ public class MMMonitPanel extends JPanel {
                                         MouseAdapter adapter = new MouseAdapter() {
                                             @Override
                                             public void mouseEntered(MouseEvent e) {
-                                                e.getComponent().setCursor(MainFrame.handCursor);
+                                                e.getComponent().setCursor(AppGlobalCnst.HAND_CURSOR);
                                             }
                                         };
                                         super.addMouseListener(adapter);

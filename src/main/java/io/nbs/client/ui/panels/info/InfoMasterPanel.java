@@ -1,6 +1,7 @@
 package io.nbs.client.ui.panels.info;
 
 import io.nbs.client.cnsts.ColorCnst;
+import io.nbs.client.ui.panels.WinResizer;
 import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.client.ui.panels.TitlePanel;
 
@@ -15,7 +16,7 @@ import java.awt.*;
  * Copyright (c) 2018, NBS , lambor.c<lanbery@gmail.com>.
  * All rights reserved.
  */
-public class InfoMasterPanel extends JPanel {
+public class InfoMasterPanel extends JPanel implements WinResizer {
     private TitlePanel winTitlePanel;
 
     private JPanel centerPanel;
@@ -35,7 +36,7 @@ public class InfoMasterPanel extends JPanel {
      * 初始化控件
      */
     private void initComponents(){
-        this.winTitlePanel = new TitlePanel(this);
+        this.winTitlePanel = new TitlePanel(this,this);
         winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.info.label","PEER INFO"));
         winTitlePanel.setBackground(ColorCnst.LIGHT_GRAY);
         /**
@@ -74,6 +75,16 @@ public class InfoMasterPanel extends JPanel {
     }
 
     private void initData(){
+
+    }
+
+    @Override
+    public void resize(double w, double h) {
+
+    }
+
+    @Override
+    public void resize() {
 
     }
 }

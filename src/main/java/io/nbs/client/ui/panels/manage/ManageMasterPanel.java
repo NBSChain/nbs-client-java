@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.manage;
 import io.nbs.client.ui.panels.TitlePanel;
+import io.nbs.client.ui.panels.WinResizer;
 import io.nbs.commons.helper.ConfigurationHelper;
 
 import javax.swing.*;
@@ -13,7 +14,7 @@ import java.awt.*;
  * Copyright (c) 2018, NBS , lambor.c<lanbery@gmail.com>.
  * All rights reserved.
  */
-public class ManageMasterPanel extends JPanel {
+public class ManageMasterPanel extends JPanel implements WinResizer {
     private static ManageMasterPanel context;
 
     private TitlePanel winTitlePanel;
@@ -33,7 +34,7 @@ public class ManageMasterPanel extends JPanel {
     }
 
     private void initComponents(){
-        winTitlePanel = new TitlePanel(this);
+        winTitlePanel = new TitlePanel(this,this);
         winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.data.label","Data Manager"));
         centerPanel = new JPanel();
         headerPanel = new MMHeaderPanel(this);
@@ -77,5 +78,15 @@ public class ManageMasterPanel extends JPanel {
 
     public MMSearcherPanel getSearcherPanel() {
         return searcherPanel;
+    }
+
+    @Override
+    public void resize(double w, double h) {
+
+    }
+
+    @Override
+    public void resize() {
+
     }
 }

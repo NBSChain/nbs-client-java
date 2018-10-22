@@ -44,14 +44,16 @@ public class TitlePanel extends ParentAvailablePanel {
     private Rectangle normalBounds;
     private long lastClickTime;
     private static Point origin = new Point();
+    private WinResizer winResizer;
 
 
     /**
      * JPanel parent
      */
-    public TitlePanel(JPanel parent) {
+    public TitlePanel(JPanel parent,WinResizer resizer) {
         super(parent);
         context = this;
+        winResizer = resizer;
         initComponents();
         initView();
         setListeners();
@@ -247,6 +249,7 @@ public class TitlePanel extends ParentAvailablePanel {
                 System.exit(1);
             }else if(e.getComponent() == maxLabel){
                 maxOrRestoreWindow();
+                winResizer.resize();
             }else if(e.getComponent() == minLabel){
                 MainFrame.getContext().setExtendedState(JFrame.ICONIFIED);
             }

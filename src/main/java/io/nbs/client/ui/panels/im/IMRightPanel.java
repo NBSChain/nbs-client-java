@@ -1,6 +1,7 @@
 package io.nbs.client.ui.panels.im;
 
 import io.nbs.client.cnsts.ColorCnst;
+import io.nbs.client.ui.panels.WinResizer;
 import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
 import io.nbs.client.ui.panels.TitlePanel;
@@ -17,7 +18,7 @@ import java.awt.*;
  * Copyright (c) 2018, NBS , lambor.c<lanbery@gmail.com>.
  * All rights reserved.
  */
-public class IMRightPanel extends ParentAvailablePanel {
+public class IMRightPanel extends ParentAvailablePanel implements WinResizer {
 
     private static IMRightPanel context;
 
@@ -41,7 +42,7 @@ public class IMRightPanel extends ParentAvailablePanel {
     }
 
     private void initComponents(){
-        winTitlePanel = new TitlePanel(this);
+        winTitlePanel = new TitlePanel(this,this);
         winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.im.label","NBS World IM"));
         cardLayout = new CardLayout();
         contentPanel = new JPanel();
@@ -70,5 +71,15 @@ public class IMRightPanel extends ParentAvailablePanel {
 
     public static IMRightPanel getContext() {
         return context;
+    }
+
+    @Override
+    public void resize(double w, double h) {
+
+    }
+
+    @Override
+    public void resize() {
+
     }
 }

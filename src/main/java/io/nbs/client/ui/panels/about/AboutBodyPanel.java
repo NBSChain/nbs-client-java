@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.about;
 
+import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
 import io.nbs.commons.utils.IconUtil;
 
@@ -37,12 +38,10 @@ public class AboutBodyPanel extends ParentAvailablePanel {
      * @return {[type]} [description]
      */
     private void initComponents() {
-
         ImageIcon icon = IconUtil.getIcon(context,"/icons/about_bg.png");
         backgroundLabel = new JLabel();
         backgroundLabel.setIcon(icon);
-
-
+        backgroundLabel.setBorder(ColorCnst.RED_BORDER);
     }
 
     /**

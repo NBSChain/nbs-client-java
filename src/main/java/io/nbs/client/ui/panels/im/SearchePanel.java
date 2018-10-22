@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.im;
 
+import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.components.GBC;
@@ -54,7 +55,7 @@ public class SearchePanel extends ParentAvailablePanel {
         menuIcon = new JLabel();
         menuIcon.setIcon(new ImageIcon(getClass().getResource("/icons/options.png")));
         menuIcon.setForeground(ColorCnst.FONT_WHITE);
-        menuIcon.setCursor(MainFrame.handCursor);
+        menuIcon.setCursor(AppGlobalCnst.HAND_CURSOR);
         operationPopupMenu = new IMOperationPopupMenu();
     }
 

@@ -141,7 +141,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                avatarLabel.setCursor(MainFrame.handCursor);
+                avatarLabel.setCursor(AppGlobalCnst.HAND_CURSOR);
                 avatarLabel.setToolTipText("点击修改头像");
                 super.mouseEntered(e);
             }
@@ -177,7 +177,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 nickLabel.setToolTipText("点击修改昵称");
-                nickLabel.setCursor(MainFrame.handCursor);
+                nickLabel.setCursor(AppGlobalCnst.HAND_CURSOR);
                 super.mouseEntered(e);
             }
         });
