@@ -179,7 +179,9 @@ public class IPMParser {
         bean.setId(UUIDGenerator.getUUID());
         bean.setNeedToResend(false);
         bean.setTimestamp(System.currentTimeMillis());
-        bean.setFrom(message.getFrom());
+        //
+        String enfromid = Base64CodecUtil.encode(message.getFrom());
+        bean.setFrom(enfromid);
         bean.setSeqno(message.getSeqno());
         bean.setMessageContent(message.getContent());
         bean.setUpdatedAt(System.currentTimeMillis());

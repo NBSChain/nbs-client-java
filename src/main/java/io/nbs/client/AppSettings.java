@@ -435,12 +435,19 @@ public class AppSettings {
      * @author      : lanbery
      * @Datetime    : 2018/10/21
      * @Description  :
-     * 
+     * 默认false
      */
     public boolean getStatus(String key){
         String enabledSunWorldPeers = getConfigVolme(key,"false");
         if(enabledSunWorldPeers.equalsIgnoreCase("true") || enabledSunWorldPeers.equals("1")
                 ||enabledSunWorldPeers.equalsIgnoreCase("enabled"))return true;
         return false;
+    }
+
+    public int tryGetFromidTimes(){
+        int times = 5;
+        String timesStr = getConfigVolme("ipfs.pubsub.fromid.try.times","5");
+        times = Integer.parseInt(timesStr);
+        return times;
     }
 }

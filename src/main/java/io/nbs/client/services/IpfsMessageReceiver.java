@@ -7,8 +7,6 @@ import io.nbs.client.Launcher;
 import io.nbs.client.listener.IPFSSubscribeListener;
 import io.nbs.client.listener.OnlineNotifier;
 import io.nbs.client.ui.frames.MainFrame;
-import io.nbs.client.ui.panels.im.ChatPanel;
-import io.nbs.commons.helper.ConfigurationHelper;
 
 import io.nbs.commons.utils.UUIDGenerator;
 import io.nbs.sdk.beans.*;
@@ -51,7 +49,7 @@ public class IpfsMessageReceiver{
 
     public IpfsMessageReceiver() {
         worldTopic = IpfsMessageSender.NBSWORLD_IMS_TOPIC;
-        ipfs = new IPFS(ConfigurationHelper.getInstance().getIPFSAddress());
+        ipfs = new IPFS(Launcher.appSettings.getHost(),Launcher.appSettings.getApiPort());
     }
 
     public void startReceiver(){

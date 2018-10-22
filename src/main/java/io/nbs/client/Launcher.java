@@ -1,6 +1,8 @@
 package io.nbs.client;
 
 import io.ipfs.api.IPFS;
+import io.ipfs.api.JSONParser;
+import io.ipfs.api.exceptions.IPFSInitialException;
 import io.ipfs.api.exceptions.IllegalIPFSMessageException;
 import io.ipfs.nbs.helper.IPAddressHelper;
 import io.nbs.client.cnsts.AppGlobalCnst;
@@ -8,6 +10,8 @@ import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.exceptions.AppInitializedException;
 import io.nbs.client.ui.frames.InitialDappFrame;
+import io.nbs.commons.helper.RadomCharactersHelper;
+import io.nbs.commons.utils.Base64CodecUtil;
 import io.nbs.sdk.beans.NodeBase;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.frames.FailFrame;
@@ -26,8 +30,13 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Package : io.ipfs.app
@@ -134,34 +143,13 @@ public class Launcher {
                 currentFrame = new MainFrame(currentPeer);
             }
         }
+        try{
+            fillFromid(ipfs);
+        }catch (IPFSInitialException iie){
+            //goto Fail
+            goFailFrame(appSettings.getConfigVolme("nbs.ipfs.pubsub.failure.msg","ipfs pubsub service startup fail."));
+        }
 
-
-//        try{
-//            String apiURL = ConfigurationHelper.getInstance().getIPFSAddress();
-//            ipfs =  new IPFS(apiURL);
-//            checkedIPFSRunning();
-//            if(ipfsRuning){
-//                boolean first = needInitConfig(ipfs);
-//                //first = true;
-//                if(first){
-//                    currentFrame = new InitialFrame(ipfs);
-//                }else {
-//                    currentFrame = new MainFrame(currentPeer);
-//                    currentFrame.setVisible(true);
-//                }
-//            }else {
-//                goFailFrame("您的 NBS 服务未启动,请检查.");
-//            }
-//        }catch (RuntimeException re){
-//            cliStartFirst =false;
-//            re.printStackTrace();
-//            System.out.println(re.getMessage());
-//            goFailFrame("您的 NBS 服务未启动,请检查.");
-//        } catch (IOException e) {
-//            cliStartFirst =false;
-//            logger.error(e.getMessage());
-//            goFailFrame("未能获取服务配置信息,请检查IPFS 服务是否已启动.");
-//        }
         currentFrame.setBackground(ColorCnst.WINDOW_BACKGROUND);
         currentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         if(OSUtil.getOsType()!=OSUtil.Mac_OS){
@@ -457,5 +445,66 @@ public class Launcher {
 
     public void setCurrentFrame(JFrame currentFrame) {
         this.currentFrame = currentFrame;
+    }
+
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/22
+     * @Description  :
+     * 填充ipfs pubsub fromid
+     */
+    public void fillFromid(IPFS ipfs) throws IPFSInitialException {
+        if(!appSettings.subWorldPeers())return;//未启用聊天模式
+        if(ipfs==null)throw new IPFSInitialException("IPFS 服务连接失败.");
+        if(currentPeer==null||currentPeer.getId()==null)throw new IPFSInitialException("请先设置IPFS Peer 信息");
+        AtomicBoolean geted = new AtomicBoolean(true);
+
+        try{
+            String fromid = ipfs.config.get(ConfigKeys.formid.key());
+            if(StringUtils.isNotBlank(fromid) && !fromid.equalsIgnoreCase("null")){
+                currentPeer.setFrom(fromid);
+                geted.set(false);
+            }else {
+                throw new IOException("no fromid");
+            }
+        }catch (IOException e){
+           //need set ipfs config
+            cycleTryFromid(geted);
+        }
+        if(currentPeer.getFrom()==null)throw new IPFSInitialException("初始化IPFS消息失败.");
+    }
+
+    private void cycleTryFromid(AtomicBoolean geted){
+        int times = Launcher.appSettings.tryGetFromidTimes();
+        AtomicInteger counter = new AtomicInteger(0);//计数器
+        String tmpTopic = RadomCharactersHelper.getInstance().generated(currentPeer.getId(),4);
+        logger.info("get fromid topic : {}",tmpTopic);
+        while (geted.get()){
+            try{
+                Stream<Map<String,Object>> subs = ipfs.pubsub.sub(tmpTopic);
+                ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
+                ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
+                List<Map<String, Object>> lst = subs.limit(1).collect(Collectors.toList());
+                Object fromidObj = JSONParser.getValue(lst.get(0),"from");
+                logger.info(fromidObj.toString());
+                if(fromidObj!=null){
+                    String fromidStr = fromidObj.toString();
+                    String enfromid = Base64CodecUtil.encode(fromidStr);
+                    logger.info("fromid encode compare : {} -- {}",fromidStr,enfromid);
+                    ipfs.config.set(ConfigKeys.formid.key(),enfromid);
+                    currentPeer.setFrom(enfromid);
+                    geted.set(false);
+                }
+            }catch (Exception exception){
+                try{
+                    TimeUnit.SECONDS.sleep(2);
+                }catch (InterruptedException ie){
+                }
+                counter.set(counter.get()+1);
+                if(counter.get()>times){
+                    geted.set(false);
+                }
+            }
+        }
     }
 }
