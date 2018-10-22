@@ -81,6 +81,6 @@ public class AboutMasterPanel extends JPanel implements WinResizer {
 
     @Override
     public void resize() {
-
+        this.bodyPanel.setPreSize();
     }
 }
