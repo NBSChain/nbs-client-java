@@ -9,14 +9,11 @@ import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.exceptions.AppInitializedException;
-import io.nbs.client.ui.frames.InitialDappFrame;
+import io.nbs.client.ui.frames.*;
 import io.nbs.commons.helper.RadomCharactersHelper;
 import io.nbs.commons.utils.Base64CodecUtil;
 import io.nbs.sdk.beans.NodeBase;
 import io.nbs.sdk.beans.PeerInfo;
-import io.nbs.client.ui.frames.FailFrame;
-import io.nbs.client.ui.frames.InitialFrame;
-import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.commons.utils.DataBaseUtil;
 import io.nbs.commons.utils.IconUtil;
 import io.nbs.sdk.constants.ConfigKeys;
@@ -56,6 +53,8 @@ public class Launcher {
     public static ImageIcon logo ;
     private static ProcessBuilder ipfsBuilder;
     private static Process ipfsProcess;
+
+    private ImageIcon loading;
     /**
      * 文件基础路径
      * ${basedir}/.nbs/
@@ -86,6 +85,7 @@ public class Launcher {
     private JFrame currentFrame;
 
     public static PeerInfo currentPeer;
+    private LoadingFrame loadingFrame;
 
     static {
         sqlSession = DataBaseUtil.getSqlSession();
@@ -99,6 +99,7 @@ public class Launcher {
     }
     public Launcher(String[] args){
         context = this;
+        loading = IconUtil.getIcon(this,"/icons/loading.gif");
         logo = IconUtil.getIcon(this,"/icons/nbs.png");
         currentPeer = new PeerInfo();
         appSettings = AppSettings.getInstance(args);
@@ -106,6 +107,8 @@ public class Launcher {
 
 
     public void launch(){
+        loadingFrame = new LoadingFrame(loading);
+        loadingFrame.setVisible(true);
         /**
          * 1.初始化目录
          */
@@ -118,6 +121,7 @@ public class Launcher {
         }catch (AppInitializedException aie){
             logger.warn(aie.getMessage());
         }
+
         /**
          * 2.构建IPFS
          */
@@ -126,28 +130,22 @@ public class Launcher {
             //构建CurrentPeer
             buildPeerInfo(currentPeer,ipfs);
             bootstrapOk = true;
+            currentFrame = new MainFrame(currentPeer);
+            try{
+                fillFromid(ipfs);
+            }catch (IPFSInitialException iie){
+                //goto Fail
+                goFailFrame(appSettings.getConfigVolme("nbs.ipfs.pubsub.failure.msg","ipfs pubsub service startup fail."));
+            }
+            hideLoadFrame();
         }catch (RuntimeException re){
             logger.warn("初始化IPFS 失败{}",re.getMessage());
+            hideLoadFrame();
+            currentFrame = new InitialDappFrame();
         }catch (IOException ioe){
             logger.warn("初始化Peer 失败 {}",ioe.getMessage());
-        }
-
-        if(!bootstrapOk){
-            //TODO goto InitialDappFrame
+            hideLoadFrame();
             currentFrame = new InitialDappFrame();
-        }else {
-            //TODO goto MainFrame
-            if(currentPeer==null||StringUtils.isBlank(currentPeer.getId())){
-                currentFrame = new InitialDappFrame();
-            }else {
-                currentFrame = new MainFrame(currentPeer);
-            }
-        }
-        try{
-            fillFromid(ipfs);
-        }catch (IPFSInitialException iie){
-            //goto Fail
-            goFailFrame(appSettings.getConfigVolme("nbs.ipfs.pubsub.failure.msg","ipfs pubsub service startup fail."));
         }
 
         currentFrame.setBackground(ColorCnst.WINDOW_BACKGROUND);
@@ -182,6 +180,13 @@ public class Launcher {
         if(cfgMap.containsKey(ConfigKeys.avatarSuffix.key()))
             info.setAvatarSuffix(cfgMap.get(ConfigKeys.avatarSuffix.key()).toString());
 
+    }
+
+    private void hideLoadFrame(){
+        if(loadingFrame!=null){
+            loadingFrame.setVisible(false);
+            loadingFrame.dispose();
+        }
     }
 
     /**
@@ -509,5 +514,9 @@ public class Launcher {
                 }
             }
         }
+    }
+
+    public ImageIcon getLoading() {
+        return loading;
     }
 }

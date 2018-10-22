@@ -186,6 +186,7 @@ public class MainFrame extends JFrame {
         setSize(winDimension);
         setMinimumSize(winDimension);
 
+
         mainJPanel.setLayout(new BorderLayout());
         mainJPanel.add(toolbarPanel,BorderLayout.WEST);
 
