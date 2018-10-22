@@ -470,8 +470,11 @@ public class Launcher {
         }catch (IOException e){
            //need set ipfs config
             cycleTryFromid(geted);
+        }catch (RuntimeException re){
+            cycleTryFromid(geted);
+        }finally {
+            if(currentPeer.getFrom()==null)throw new IPFSInitialException("初始化IPFS消息失败.");
         }
-        if(currentPeer.getFrom()==null)throw new IPFSInitialException("初始化IPFS消息失败.");
     }
 
     private void cycleTryFromid(AtomicBoolean geted){

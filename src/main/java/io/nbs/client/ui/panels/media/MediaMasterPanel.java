@@ -108,7 +108,10 @@ public class MediaMasterPanel extends JPanel implements WinResizer {
      * 疯狂假期BD国粤英三语中英双字.mp4
      */
     public void loadHash(String hash){
-        hash = "QmRpbJe2MTyDKrUxsjXmgtYJPquVuZwoY6iqtD6Dh9TS5v";
+        hash = "QmULJfzUTHm6UJki5kdb1B8EhKpZwsoHDEV4ohPxnqxWzJ";
+
+        //QmULJfzUTHm6UJki5kdb1B8EhKpZwsoHDEV4ohPxnqxWzJ mp3
+        //QmRpbJe2MTyDKrUxsjXmgtYJPquVuZwoY6iqtD6Dh9TS5v mp4
         int web_width = this.centerPanel.getWidth();
         int web_height = this.centerPanel.getHeight();
         logger.info("w*h = {}*{}",web_height,web_height);
