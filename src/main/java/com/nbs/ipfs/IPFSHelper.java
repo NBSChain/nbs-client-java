@@ -37,6 +37,7 @@ public class IPFSHelper {
     public static final String NBSWORLD_CTRL_TOPIC = Base64CodecUtil.encode("$NBS.CTRL.J$");
     public static final String NBSWORLD_IMS_TOPIC = Base64CodecUtil.encode("nbsio.net");
 
+
     public IPFSHelper() {
         ipfs = new IPFS(Launcher.appSettings.getHost(),Launcher.appSettings.getApiPort());
         try {
