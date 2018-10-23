@@ -78,13 +78,15 @@ public class DappIPFSStepPanel extends JPanel {
     private static AtomicBoolean CONN_PASS =  new AtomicBoolean(false);
     private static String CONN_MSG = "";
 
-
-
-    public DappIPFSStepPanel(){
+    public DappIPFSStepPanel(String msg){
         initIpfsDefaultConf();
-        initComponents();
+        initComponents(msg);
         initView();
         setListeners();
+    }
+
+    public DappIPFSStepPanel(){
+       this(null);
     }
 
     private void initIpfsDefaultConf(){
@@ -104,7 +106,7 @@ public class DappIPFSStepPanel extends JPanel {
      * @Description  :
      *
      */
-    private void initComponents(){
+    private void initComponents(String msg){
         loadingLabel = new JLabel(Launcher.getContext().getLoading());
         loadingLabel.setHorizontalAlignment(JLabel.RIGHT);
 
@@ -221,8 +223,6 @@ public class DappIPFSStepPanel extends JPanel {
         statusPanel = new JPanel();
         statusPanel.setLayout(new GridBagLayout());
         statusLabel = new JLabel("connecting "+ Launcher.appSettings.getHost());
-        statusLabel.setForeground(ColorCnst.COLOR_BULE);
-        statusLabel.setHorizontalAlignment(JLabel.LEFT);
         statusLabel.setFont(FontUtil.getDefaultFont(14));
         //statusLabel.setForeground(ColorCnst.RED);
 
@@ -231,9 +231,19 @@ public class DappIPFSStepPanel extends JPanel {
         statusPanel.add(statusLabel,
                 new GBC(1,0).setWeight(9,1).setFill(GBC.HORIZONTAL).setInsets(0,5,0,0));
 
-        statusPanel.setVisible(false);
+        if(StringUtils.isNotBlank(msg)){
+            statusPanel.setVisible(true);
+            statusLabel.setHorizontalAlignment(JLabel.HORIZONTAL);
+            statusLabel.setForeground(ColorCnst.RED);
+            statusLabel.setText(msg);
+            loadingLabel.setVisible(false);
+        }else {
+            statusLabel.setForeground(ColorCnst.COLOR_BULE);
+            statusLabel.setHorizontalAlignment(JLabel.LEFT);
+            statusPanel.setVisible(false);
+            loadingLabel.setVisible(true);
+        }
         statusLabel.setVisible(true);
-        loadingLabel.setVisible(true);
 
         //loadingLabel.setBorder(ColorCnst.RED_BORDER);
 

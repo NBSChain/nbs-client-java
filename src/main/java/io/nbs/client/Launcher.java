@@ -144,11 +144,11 @@ public class Launcher {
         }catch (RuntimeException re){
             logger.warn("初始化IPFS 失败{}",re.getMessage());
             hideLoadFrame();
-            currentFrame = new InitialDappFrame();
+            currentFrame = new InitialDappFrame("connected failure. host :"+ appSettings.getHost());
         }catch (IOException ioe){
             logger.warn("初始化Peer 失败 {}",ioe.getMessage());
             hideLoadFrame();
-            currentFrame = new InitialDappFrame();
+            currentFrame = new InitialDappFrame("connected failure. host :"+ appSettings.getHost());
         }
 
         currentFrame.setBackground(ColorCnst.WINDOW_BACKGROUND);

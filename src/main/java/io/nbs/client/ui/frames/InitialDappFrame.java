@@ -12,6 +12,7 @@ import io.nbs.client.ui.components.GBC;
 import io.nbs.client.ui.panels.init.DappBaseStepPanel;
 import io.nbs.client.ui.panels.init.DappIPFSStepPanel;
 import io.nbs.commons.utils.IconUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,15 +58,19 @@ public class InitialDappFrame extends JFrame {
 
 
     public InitialDappFrame(){
+        this(null);
+    }
+
+    public InitialDappFrame(String msg){
         context = this;
         toolkit = Toolkit.getDefaultToolkit();
-        initComponents();
+        initComponents(msg);
         initView();
         setListeners();
         centerScreen();
     }
 
-    private void initComponents(){
+    private void initComponents(String msg){
         Dimension windowSize = new Dimension(W, H);
         setMinimumSize(windowSize);
         setMaximumSize(windowSize);
@@ -100,7 +105,7 @@ public class InitialDappFrame extends JFrame {
         contentPanel = new JPanel();
         contentPanel.setLayout(cardLayout);
 
-        ipfsStepPanel = new DappIPFSStepPanel();
+        ipfsStepPanel = new DappIPFSStepPanel(msg);
         baseStepPanel = new DappBaseStepPanel();
 
         contentPanel.add(ipfsStepPanel, InitDappSteps.setIpfs.name());
@@ -132,7 +137,6 @@ public class InitialDappFrame extends JFrame {
     }
 
     private void setListeners(){
-
         //
         GUI4JHelper.addWinCloseIconListener(closeLabel);
 
