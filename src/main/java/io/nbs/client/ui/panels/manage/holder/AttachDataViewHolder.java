@@ -148,23 +148,25 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         openBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String urlBase = ConfigurationHelper.getInstance().getGateWayURL();
+                String urlBase = Launcher.appSettings.getBaseGatewayUrl();
                 Object o = attachmentPanel.getTag();
                 if(o!=null&& o instanceof AttachmentDataDTO){
                     AttachmentDataDTO m = (AttachmentDataDTO)o;
                     if(StringUtils.isNotBlank(m.getId())){
-                        String hash = m.getId();
-                        java.net.URI uri = java.net.URI.create(urlBase+hash);
-                        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                        if(desktop.isSupported(Desktop.Action.BROWSE)){
-                            try {
-                                desktop.browse(uri);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                                logger.error(e1.getMessage());
-                            }
-                        }
-
+                        //内部open
+                        MainFrame.getContext().openLoadHashMedia(m.getId());
+                        /* browser open */
+//                        String hash = m.getId();
+//                        java.net.URI uri = java.net.URI.create(urlBase+ hash);
+//                        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+//                        if(desktop.isSupported(Desktop.Action.BROWSE)){
+//                            try {
+//                                desktop.browse(uri);
+//                            } catch (IOException e1) {
+//                                e1.printStackTrace();
+//                                logger.error(e1.getMessage());
+//                            }
+//                        }
                     }
                 }
             }

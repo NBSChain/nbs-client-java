@@ -324,4 +324,10 @@ public class MainFrame extends JFrame {
     public MediaMasterPanel getMediaMasterPanel() {
         return mediaMasterPanel;
     }
+
+    public MainFrame openLoadHashMedia(String hash){
+        mainWinShow(MainCardLayoutTypes.MEDIA);
+        loadMedia(hash);
+        return context;
+    }
 }

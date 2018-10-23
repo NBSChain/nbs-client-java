@@ -66,7 +66,7 @@ public class JMediaPlayer extends JPanel {
         //hash = "QmULJfzUTHm6UJki5kdb1B8EhKpZwsoHDEV4ohPxnqxWzJ";
         if(currentHash!=null && currentHash.equals(hash)){
             repeated.set(true);
-            return context;
+            //return context;
         }else {
             repeated.set(false);
         }

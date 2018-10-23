@@ -160,6 +160,7 @@ public class MediaMasterPanel extends JPanel implements WinResizer {
         if(StringUtils.isBlank(hash)){
             this.switchCard(MediaCard.searcher);
         }else {
+            this.switchCard(MediaCard.player);
             this.mediaPlayer.loadHash(hash);
         }
     }
