@@ -8,11 +8,13 @@ import io.ipfs.api.exceptions.IllegalFormatException;
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
+import io.nbs.client.ui.components.GBC;
 import io.nbs.client.ui.components.NBSButton;
 import io.nbs.client.ui.components.VerticalFlowLayout;
 import io.nbs.client.ui.frames.InitialDappFrame;
 import io.nbs.commons.utils.IconUtil;
 import io.nbs.commons.utils.RegexUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Copyright © 2015-2020 NBSChain Holdings Limited.
@@ -68,6 +72,12 @@ public class DappIPFSStepPanel extends JPanel {
     private String hostStr;
     private String apiPort;
     private String gatewayPort;
+    private JLabel loadingLabel;
+
+    private static AtomicBoolean connecting = new AtomicBoolean(false);
+    private static AtomicBoolean CONN_PASS =  new AtomicBoolean(false);
+    private static String CONN_MSG = "";
+
 
 
     public DappIPFSStepPanel(){
@@ -85,6 +95,7 @@ public class DappIPFSStepPanel extends JPanel {
 
         passIcon = IconUtil.getIcon(this,"/icons/pass18.png");
         warnIcon = IconUtil.getIcon(this,"/icons/warn18.png");
+
     }
 
     /**
@@ -94,6 +105,9 @@ public class DappIPFSStepPanel extends JPanel {
      *
      */
     private void initComponents(){
+        loadingLabel = new JLabel(Launcher.getContext().getLoading());
+        loadingLabel.setHorizontalAlignment(JLabel.RIGHT);
+
         /**
          * 内容编辑区
          */
@@ -205,11 +219,23 @@ public class DappIPFSStepPanel extends JPanel {
 
         /* Status Panel */
         statusPanel = new JPanel();
-        statusLabel = new JLabel();
+        statusPanel.setLayout(new GridBagLayout());
+        statusLabel = new JLabel("connecting "+ Launcher.appSettings.getHost());
+        statusLabel.setForeground(ColorCnst.COLOR_BULE);
+        statusLabel.setHorizontalAlignment(JLabel.LEFT);
         statusLabel.setFont(FontUtil.getDefaultFont(14));
-        statusLabel.setForeground(ColorCnst.RED);
-        statusPanel.setVisible(true);
-        statusPanel.add(statusLabel);
+        //statusLabel.setForeground(ColorCnst.RED);
+
+        statusPanel.add(loadingLabel,
+                new GBC(0,0).setWeight(2,1).setFill(GBC.HORIZONTAL).setInsets(0,5,0,0));
+        statusPanel.add(statusLabel,
+                new GBC(1,0).setWeight(9,1).setFill(GBC.HORIZONTAL).setInsets(0,5,0,0));
+
+        statusPanel.setVisible(false);
+        statusLabel.setVisible(true);
+        loadingLabel.setVisible(true);
+
+        //loadingLabel.setBorder(ColorCnst.RED_BORDER);
 
         /* edit Panel Layout */
         editPanel.add(hostLabelPanel);
@@ -262,22 +288,36 @@ public class DappIPFSStepPanel extends JPanel {
         connectButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String msg = "";
-                try{
-                    connectIPFS();
-                    setValidTip(3);
-                    msg = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.success","Connected Successful.");
-                    showStatusPanel(msg,ColorCnst.PROGRESS_BAR_START);
-                }catch ( IPFSInitialException exception){
-                    msg = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.fail","Connected failure..");
-                    logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),exception.getMessage());
-                    setValidTip(0);
-                    showStatusPanel(msg,null);
-                }catch (IllegalFormatException ex){
-                    msg = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.illegal","Connected failure..");
-                    logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),"格式错误");
-                    showStatusPanel(msg,null);
-                }
+                CONN_PASS.set(false);
+                connecting.set(true);
+                componentsDisabled(true);
+                connectingThread();
+
+                new Thread(()->{
+                    try{
+                        connectIPFS();
+                        setValidTip(3);
+                        CONN_MSG = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.success","Connected Successful.");
+                        connectedShowStatus(true,CONN_MSG);
+                        connecting.set(false);
+                        CONN_PASS.set(true);
+                    }catch ( IPFSInitialException exception){
+                        connecting.set(false);
+                        CONN_PASS.set(false);
+                        CONN_MSG = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.fail","Connected failure..");
+                        logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),exception.getMessage());
+                        setValidTip(0);
+                        connectedShowStatus(false,CONN_MSG);
+                    }catch (IllegalFormatException ex){
+                        connecting.set(false);
+                        CONN_PASS.set(false);
+                        CONN_MSG = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.illegal","Connected failure..");
+                        logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),"格式错误");
+                        connectedShowStatus(false,CONN_MSG);
+                    }
+
+                }).start();
+
             }
         });
 
@@ -285,22 +325,32 @@ public class DappIPFSStepPanel extends JPanel {
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String msg = "";
-                try{
-                    IPFS ipfs = connectIPFS();
-                    updateDappConfMap();
-                    DappBaseStepPanel.getContext().setIpfs(ipfs).loadNodeInfo();
-                    InitialDappFrame.getContext().showStep(InitialDappFrame.InitDappSteps.setDapp);
-                }catch (IPFSInitialException exception){
-                    msg = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.connected.fail","Connected failure..");
-                    logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),exception.getMessage());
-                    setValidTip(0);
-                    showStatusPanel(msg,null);
-                }catch (IllegalFormatException ex){
-                    msg = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.connected.illegal","Connected failure..");
-                    logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),"格式错误");
-                    showStatusPanel(msg,null);
-                }
+                CONN_PASS.set(false);
+                connecting.set(true);
+                componentsDisabled(true);
+                connectingThread();
+                new Thread(()->{
+                    try{
+                        IPFS ipfs = connectIPFS();
+                        updateDappConfMap();
+                        DappBaseStepPanel.getContext().setIpfs(ipfs).loadNodeInfo();
+                        clearStatusPanel();
+                        InitialDappFrame.getContext().showStep(InitialDappFrame.InitDappSteps.setDapp);
+                    }catch (IPFSInitialException exception){
+                        connecting.set(false);
+                        CONN_PASS.set(false);
+                        CONN_MSG = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.connected.fail","Connected failure..");
+                        logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),exception.getMessage());
+                        setValidTip(0);
+                        connectedShowStatus(false,CONN_MSG);
+                    }catch (IllegalFormatException ex){
+                        connecting.set(false);
+                        CONN_PASS.set(false);
+                        CONN_MSG = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.connected.illegal","Connected failure..");
+                        logger.warn("Connected IPFS {} failure,maybe cause by :{}",buildAddress(true),"格式错误");
+                        connectedShowStatus(false,CONN_MSG);
+                    }
+                }).start();
             }
         });
 
@@ -363,6 +413,36 @@ public class DappIPFSStepPanel extends JPanel {
         });
     }
 
+    private void componentsDisabled(boolean disabled){
+        if(disabled){
+            hostField.setEnabled(false);
+            apiPortFeild.setEnabled(false);
+            gatewayPortFeild.setEnabled(false);
+            connectButton.setEnabled(false);
+            nextButton.setEnabled(false);
+        }else {
+            hostField.setEnabled(true);
+            apiPortFeild.setEnabled(true);
+            gatewayPortFeild.setEnabled(true);
+            connectButton.setEnabled(true);
+            nextButton.setEnabled(true);
+        }
+    }
+    private void connectingThread(){
+        new Thread(()->{
+            int i = 0;
+            while (connecting.get()){
+                i++;
+                connecting(i);
+                try{
+                    TimeUnit.SECONDS.sleep(1);
+                }catch (InterruptedException ie){}
+            }
+            connectedShowStatus(CONN_PASS.get(),CONN_MSG);
+            componentsDisabled(false);
+        }).start();
+    }
+
     private IPFS connectIPFS() throws IPFSInitialException, IllegalFormatException {
         String host = hostField.getText();
         String apiPortStr = apiPortFeild.getText();
@@ -403,19 +483,46 @@ public class DappIPFSStepPanel extends JPanel {
         //
     }
 
-    private void showStatusPanel(String content,Color color){
-        statusLabel.setText(content);
-        if(color==null) color = ColorCnst.RED;
-        statusLabel.setForeground(color);
-        statusLabel.setVisible(true);
-        statusLabel.updateUI();
-    }
 
     private void clearStatusPanel(){
         statusLabel.setText("");
+        statusPanel.setVisible(false);
         statusLabel.setVisible(false);
+        loadingLabel.setVisible(false);
         statusLabel.updateUI();
     }
+
+    public void connecting(Integer times){
+        statusPanel.setVisible(true);
+        String t = times!=null ? times.toString() : "";
+        statusLabel.setText("connecting "+ hostField.getText()+"... "+ t);
+        statusLabel.setForeground(ColorCnst.COLOR_BULE);
+        statusLabel.setHorizontalAlignment(JLabel.LEFT);
+        loadingLabel.setVisible(true);
+        statusLabel.setVisible(true);
+        statusPanel.updateUI();
+    }
+
+    public void connectedShowStatus(boolean b,String message){
+        statusPanel.setVisible(true);
+        loadingLabel.setVisible(false);
+        statusLabel.setVisible(true);
+        Color color = ColorCnst.COLOR_GREEN;
+        if(!b)color = ColorCnst.RED;
+        if(StringUtils.isBlank(message)){
+            if(b){
+                message = "successful.";
+            }else {
+                message = "failure.";
+            }
+        }
+        statusLabel.setHorizontalAlignment(JLabel.HORIZONTAL);
+        statusLabel.setText(message);
+        statusLabel.setForeground(color);
+        statusPanel.updateUI();
+    }
+
+
 
     private void refreshAddressShow(DocumentEvent e,int type){
         if(type <= 0 || type >3)return;

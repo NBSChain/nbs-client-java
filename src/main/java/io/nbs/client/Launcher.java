@@ -55,6 +55,7 @@ public class Launcher {
     private static Process ipfsProcess;
 
     private ImageIcon loading;
+    private ImageIcon settingsIcon;
     /**
      * 文件基础路径
      * ${basedir}/.nbs/
@@ -100,6 +101,7 @@ public class Launcher {
     public Launcher(String[] args){
         context = this;
         loading = IconUtil.getIcon(this,"/icons/loading.gif");
+        settingsIcon = IconUtil.getIcon(this,"/icons/settings.gif");
         logo = IconUtil.getIcon(this,"/icons/nbs.png");
         currentPeer = new PeerInfo();
         appSettings = AppSettings.getInstance(args);
@@ -107,8 +109,9 @@ public class Launcher {
 
 
     public void launch(){
-        loadingFrame = new LoadingFrame(loading);
+        loadingFrame = new LoadingFrame(settingsIcon);
         loadingFrame.setVisible(true);
+        loadingFrame.setIconImage(logo.getImage());
         /**
          * 1.初始化目录
          */
@@ -518,5 +521,13 @@ public class Launcher {
 
     public ImageIcon getLoading() {
         return loading;
+    }
+
+    public static ImageIcon getLogo() {
+        return logo;
+    }
+
+    public ImageIcon getSettingsIcon() {
+        return settingsIcon;
     }
 }

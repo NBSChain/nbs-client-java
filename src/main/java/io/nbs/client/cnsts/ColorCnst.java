@@ -15,6 +15,8 @@ import java.awt.*;
 public class ColorCnst {
     public static final Border RED_BORDER =  BorderFactory.createLineBorder (Color.RED,1);
     public static final Color RED = new Color(228, 74, 47);
+    public static final Color COLOR_GREEN = new Color(51, 154, 69);
+    public static final Color COLOR_BULE = new Color(51,153,255);
     public static final Color FONT_MAIN = new Color(51,51,51);
     public static final Color FONT_BLACK = new Color(0,0,0);
     public static final Color SHADOW = new Color(221, 221, 221);
@@ -39,6 +41,7 @@ public class ColorCnst {
     public static Color PROGRESS_BAR_END = new Color(133, 194, 97);
     public static Color MAIN_COLOR = new Color(54, 172, 72);
     public static Color MAIN_COLOR_DARKER = new Color(51, 154, 69);
+
     public static final Color SCROLL_BAR_THUMB = new Color(122, 122, 122);
     public static final Color SCROLL_BAR_TTRACK = new Color(175, 175, 175);
     public static Color SCROLL_BAR_TRACK_LIGHT = new Color(214, 214, 214);
