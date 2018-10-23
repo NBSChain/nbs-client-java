@@ -3,23 +3,19 @@ package io.nbs.client.ui.panels.media;
 
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
-import io.nbs.client.ui.components.LCJlabel;
-import io.nbs.client.ui.frames.MainFrame;
+import io.nbs.client.ui.components.adapters.MessageMouseListener;
 import io.nbs.client.ui.panels.TitlePanel;
 import io.nbs.client.ui.panels.WinResizer;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
+
+import io.nbs.commons.utils.IconUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @Package : io.nbs.client.ui.panels.media
@@ -32,17 +28,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class MediaMasterPanel extends JPanel implements WinResizer {
     private static final Logger logger = LoggerFactory.getLogger(MediaMasterPanel.class);
     private static MediaMasterPanel context;
+    private static MediaCard currentCard = MediaCard.searcher;
     //top
     private TitlePanel winTitlePanel;
 
     private JPanel centerPanel;
-    private final JFXPanel webBrowser = new JFXPanel();
-    private static Group root;
-    private static WebView view;
-    private static WebEngine engine;
-    private JTextField searchHash;
-    private MediaPlayer player;
-    private PlayerThread playerThread;
+
+    private CardLayout cardLayout;
+
+    private HashSearchPanel searchPanel;
+    private JMediaPlayer mediaPlayer;
+
+    private JLabel goSearchIcon;
 
     /**
      * construction
@@ -60,11 +57,17 @@ public class MediaMasterPanel extends JPanel implements WinResizer {
      * @return {[type]} [description]
      */
     private void initComponents() {
-        this.winTitlePanel = new TitlePanel(this,this);
+        ImageIcon searchIcon = IconUtil.getIcon(this,"/icons/go-searcher.png");
+        goSearchIcon = new JLabel();
+        goSearchIcon.setIcon(searchIcon);
+        this.winTitlePanel = new TitlePanel(this,this,goSearchIcon);
         winTitlePanel.setTitle(Launcher.appSettings.getConfigVolme("nbs.ui.panel.media.label","MultiMedia"));
         winTitlePanel.setBackground(ColorCnst.LIGHT_GRAY);
-        //webBrowser.setBorder(ColorCnst.RED_BORDER);
+
         centerPanel = new JPanel();
+        cardLayout = new CardLayout();
+
+
     }
 
     /**
@@ -73,21 +76,40 @@ public class MediaMasterPanel extends JPanel implements WinResizer {
      * @return {[type]} [description]
      */
     private void initView() {
-        setLayout(new BorderLayout());
-        /* ======================= 构造内部Start =====================*/
-        centerPanel.setLayout(new BorderLayout());
-        LCJlabel msgLabel = new LCJlabel("该功能尚未开放，尽请期待....",16);
-        msgLabel.setForeground(ColorCnst.FONT_ABOUT_TITLE_BLUE);
-        msgLabel.setHorizontalAlignment(JLabel.CENTER);
+        this.setLayout(new BorderLayout());
 
-        centerPanel.add(msgLabel,BorderLayout.CENTER);
-        /* ======================= 构造内部End =====================*/
-        add(winTitlePanel,BorderLayout.NORTH);
-        add(centerPanel,BorderLayout.CENTER);
+        centerPanel.setLayout(cardLayout);
+
+        //添加卡片
+        searchPanel = new HashSearchPanel(this);
+        centerPanel.add(searchPanel,MediaCard.searcher.name());
+
+        mediaPlayer = new JMediaPlayer();
+        centerPanel.add(mediaPlayer,MediaCard.player.name());
+
+
+        this.add(winTitlePanel,BorderLayout.NORTH);
+        this.add(centerPanel,BorderLayout.CENTER);
     }
 
     private void setListeners() {
+        goSearchIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                logger.info("show searcher...");
+                MediaMasterPanel.getContext().switchCard(null);
+            }
 
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                goSearchIcon.setBackground(ColorCnst.LIGHT_GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                goSearchIcon.setBackground(ColorCnst.WINDOW_BACKGROUND);
+            }
+        });
     }
 
     /**
@@ -99,135 +121,46 @@ public class MediaMasterPanel extends JPanel implements WinResizer {
         return context;
     }
 
+    public static enum MediaCard {
+        searcher,player;
+    }
 
     /**
      * @author      : lanbery
-     * @Datetime    : 2018/10/22
+     * @Datetime    : 2018/10/23
      * @Description  :
-     * QmZpxzi13n2zHamyZoGBYRzQu5f2ZkCzTv8fDDajKtiop4
-     * 疯狂假期BD国粤英三语中英双字.mp4
+     * null 切换，
+     * not 设置
      */
-    public void loadHash(String hash){
-        hash = "QmULJfzUTHm6UJki5kdb1B8EhKpZwsoHDEV4ohPxnqxWzJ";
-
-        //QmULJfzUTHm6UJki5kdb1B8EhKpZwsoHDEV4ohPxnqxWzJ mp3
-        //QmRpbJe2MTyDKrUxsjXmgtYJPquVuZwoY6iqtD6Dh9TS5v mp4
-        int web_width = this.centerPanel.getWidth();
-        int web_height = this.centerPanel.getHeight();
-        logger.info("w*h = {}*{}",web_height,web_height);
-        String url;
-        url = Launcher.appSettings.getGatewayURL(hash);
-        if(playerThread == null || playerThread.notloaded(url)){
-            playerThread = null;
-            playerThread = new PlayerThread(url,new Integer(web_width).doubleValue(),new Integer(web_height).doubleValue());
-            Platform.runLater(playerThread);
+    public void switchCard(MediaCard mediaCard){
+        if(mediaCard == null ){
+            for(MediaCard card : MediaCard.values()){
+                if(card != currentCard){
+                    currentCard = card;
+                    this.cardLayout.show(centerPanel,currentCard.name());
+                    return;
+                }
+            }
         }else {
-
+            currentCard = mediaCard;
+            this.cardLayout.show(centerPanel,mediaCard.name());
         }
-        //player = new MediaPlayer(url,new Integer(web_width).doubleValue(),new Integer(web_height).doubleValue());
-        this.remove(centerPanel);
-        this.add(webBrowser,BorderLayout.CENTER);
-        this.updateUI();
-    }
-
-    @Override
-    public void resize(double w, double h) {
-        logger.info("media resize.....");
     }
 
     @Override
     public void resize() {
-        Rectangle rect = MainFrame.getContext().getBounds();
-        int cW = rect.width;
-        int cH = rect.height;
-        logger.info("media resize.....{}*{}",cW,cH);
-        if(view!=null){
-            view.setPrefSize(new Integer(cW).doubleValue(),new Integer(cH).doubleValue());
-        }
+        this.mediaPlayer.resize();
     }
 
-    public void destoryPlatform(){
-        if(playerThread!=null){
-            playerThread.interrupt();
-        }
+    public JMediaPlayer getMediaPlayer() {
+        return mediaPlayer;
     }
 
-    private class PlayerThread extends Thread {
-        private AtomicBoolean ctrlPlayer = new AtomicBoolean(true);
-        private String url ;
-        private double width;
-        private double height;
-        public PlayerThread(String url,double w,double h){
-            this.url = url;
-            this.width =w;
-            this.height = h;
-        }
-        @Override
-        public void run() {
-            super.run();
-            if(!ctrlPlayer.get())return;
-            root = new Group();
-            Scene scene = new Scene(root, width,height);
-            webBrowser.setScene(scene);
-            webBrowser.setLayout(new BorderLayout());
-            view = new WebView();
-            view.setMinSize(width,height);
-            view.setPrefSize(width,height);
-            engine = view.getEngine();
-            //http://47.52.172.234:8080/ipfs/Qmc4KoWZBR5937qzGP8hEWsfu5wZPPMRxC8jThf4bQ6k2D
-            engine.load(url);
-            root.getChildren().add(view);
-        }
-
-        public boolean notloaded(String url) {
-            return !this.url.equalsIgnoreCase(url);
-        }
-
-
-    }
-
-    private class MediaPlayer implements Runnable{
-        private AtomicBoolean ctrlPlayer = new AtomicBoolean(true);
-        private String url ;
-        private double width;
-        private double height;
-        public MediaPlayer (String url,double w,double h){
-            this.url = url;
-            this.width =w;
-            this.height = h;
-        }
-        @Override
-        public void run() {
-            if(!ctrlPlayer.get())return;
-            root = new Group();
-            Scene scene = new Scene(root, width,height);
-            webBrowser.setScene(scene);
-            webBrowser.setLayout(new BorderLayout());
-            view = new WebView();
-            view.setMinSize(width,height);
-            view.setPrefSize(width,height);
-            engine = view.getEngine();
-            //http://47.52.172.234:8080/ipfs/Qmc4KoWZBR5937qzGP8hEWsfu5wZPPMRxC8jThf4bQ6k2D
-            engine.load(url);
-            root.getChildren().add(view);
-            new Thread(()->{
-                listener(root,view);
-            }).start();
-        }
-
-        public void listener(Group root,WebView view){
-            while (ctrlPlayer.get()){
-                try{
-                    TimeUnit.SECONDS.sleep(2);
-                }catch (InterruptedException e){
-                }
-            }
-            logger.info("destroy...");
-            root.getChildren().remove(view);
-        }
-
-        public void stop() {
-            this.ctrlPlayer.set(false);
+    public void openAndLoadHash(String hash){
+        if(StringUtils.isBlank(hash)){
+            this.switchCard(MediaCard.searcher);
+        }else {
+            this.mediaPlayer.loadHash(hash);
         }
     }
 }

@@ -224,7 +224,7 @@ public class MainFrame extends JFrame {
      */
     public void mainWinShow(MainCardLayoutTypes clType){
         if(clType!=MainCardLayoutTypes.MEDIA){
-            this.mediaMasterPanel.destoryPlatform();
+            //this.mediaMasterPanel.destoryPlatform();
         }
         cardLayout.show(mainCentetPanel,clType.name());
     }
@@ -316,7 +316,9 @@ public class MainFrame extends JFrame {
     }
 
     public void loadMedia(String hash){
-        if(this.mediaMasterPanel!=null)this.mediaMasterPanel.loadHash(hash);
+        if(this.mediaMasterPanel!=null){
+            this.mediaMasterPanel.openAndLoadHash(hash);
+        }
     }
 
     public MediaMasterPanel getMediaMasterPanel() {

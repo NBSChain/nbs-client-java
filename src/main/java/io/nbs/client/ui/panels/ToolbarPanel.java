@@ -191,7 +191,7 @@ public class ToolbarPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 selectedBTN(musicBTN);
                 mainCtx.mainWinShow(MainFrame.MainCardLayoutTypes.MEDIA);
-                mainCtx.loadMedia("QmZpxzi13n2zHamyZoGBYRzQu5f2ZkCzTv8fDDajKtiop4");
+                mainCtx.loadMedia(null);
             }
         });
     }

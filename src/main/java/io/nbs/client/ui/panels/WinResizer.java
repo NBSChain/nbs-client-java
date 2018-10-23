@@ -10,8 +10,5 @@ package io.nbs.client.ui.panels;
  * Created  : 2018/10/22
  */
 public interface WinResizer {
-
-    public void resize(double w,double h);
-
     public void resize();
 }

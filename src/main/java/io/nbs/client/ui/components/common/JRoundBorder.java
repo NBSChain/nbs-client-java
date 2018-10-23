@@ -1,5 +1,7 @@
 package io.nbs.client.ui.components.common;
 
+import io.nbs.client.cnsts.ColorCnst;
+
 import javax.swing.border.Border;
 import java.awt.*;
 
@@ -16,18 +18,17 @@ public class JRoundBorder implements Border {
 
 
     public JRoundBorder(Color color) {
-        this.color = color;
+        if(color==null){
+            this.color = ColorCnst.FONT_GRAY_DARKER;
+        }else {
+            this.color = color;
+        }
     }
 
     public JRoundBorder() {
-        initColor();
+        this(null);
     }
 
-
-
-    private void initColor(){
-        this.color = new Color(255,102,99);
-    }
 
 
     @Override
@@ -38,10 +39,10 @@ public class JRoundBorder implements Border {
             cW = c.getWidth();
             cH = c.getHeight();
         }
-        int arcWidth = cW/2;
-        int arcHeight = cH/2;
-        g.drawRoundRect(0,0,cW,cH,arcWidth,arcHeight);
-
+        int arcWidth = cW/2 -1 > 0 ? (cW/2 -1) : 2;
+        int arcHeight = cH/2 - 1 > 0 ? (cH/2 - 1) : 2;
+        int arcSize = arcWidth > arcHeight ? arcHeight : arcWidth;
+        g.drawRoundRect(0,0,cW,cH,arcSize,arcSize);
     }
 
     @Override

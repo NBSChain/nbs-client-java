@@ -79,11 +79,6 @@ public class InfoMasterPanel extends JPanel implements WinResizer {
     }
 
     @Override
-    public void resize(double w, double h) {
-
-    }
-
-    @Override
     public void resize() {
 
     }

@@ -74,11 +74,6 @@ public class IMRightPanel extends ParentAvailablePanel implements WinResizer {
     }
 
     @Override
-    public void resize(double w, double h) {
-
-    }
-
-    @Override
     public void resize() {
 
     }

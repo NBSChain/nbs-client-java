@@ -39,6 +39,7 @@ public class TitlePanel extends ParentAvailablePanel {
     private ImageIcon minIcon;
     private ImageIcon restoreIcon;
 
+
     private boolean windowMax ;
     private Rectangle desktopBounds; // 去除任务栏后窗口的大小
     private Rectangle normalBounds;
@@ -51,16 +52,22 @@ public class TitlePanel extends ParentAvailablePanel {
      * JPanel parent
      */
     public TitlePanel(JPanel parent,WinResizer resizer) {
+        this(parent,resizer,null);
+    }
+
+    public TitlePanel(JPanel parent,WinResizer resizer,JLabel extLabel) {
         super(parent);
         context = this;
         winResizer = resizer;
-        initComponents();
+        initComponents(extLabel);
         initView();
         setListeners();
         initBounds();
     }
 
-    private void initComponents(){
+
+
+    private void initComponents(JLabel extLabel){
         setBackground(ColorCnst.WINDOW_BACKGROUND);
         Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
         Dimension ctrlItemSize = new Dimension(30,30);
@@ -108,13 +115,20 @@ public class TitlePanel extends ParentAvailablePanel {
         minLabel.setCursor(handCursor);
         minLabel.addMouseListener(listener);
 
+        if(extLabel!=null){
+            extLabel.setHorizontalAlignment(JLabel.CENTER);
+            extLabel.setPreferredSize(ctrlItemSize);
+            extLabel.setCursor(handCursor);
+            extLabel.setOpaque(true);
+            ctrlPanel.add(extLabel);
+        }
+
     }
 
     /**
      *
      */
     private void initView(){
-        setLayout(new GridBagLayout());
         setLayout(new GridBagLayout());
         JPanel left = new JPanel();
         left.setLayout(new FlowLayout(FlowLayout.LEFT,5,0));

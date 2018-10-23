@@ -229,7 +229,7 @@ public class DappIPFSStepPanel extends JPanel {
         statusPanel.add(loadingLabel,
                 new GBC(0,0).setWeight(2,1).setFill(GBC.HORIZONTAL).setInsets(0,5,0,0));
         statusPanel.add(statusLabel,
-                new GBC(1,0).setWeight(9,1).setFill(GBC.HORIZONTAL).setInsets(0,5,0,0));
+                new GBC(1,0).setWeight(8,1).setFill(GBC.HORIZONTAL).setInsets(0,5,0,0));
 
         if(StringUtils.isNotBlank(msg)){
             statusPanel.setVisible(true);
@@ -344,7 +344,9 @@ public class DappIPFSStepPanel extends JPanel {
                         IPFS ipfs = connectIPFS();
                         updateDappConfMap();
                         DappBaseStepPanel.getContext().setIpfs(ipfs).loadNodeInfo();
-                        clearStatusPanel();
+                        connecting.set(false);
+                        CONN_MSG = Launcher.appSettings.getConfigVolme("dapp.initStepIpfs.frame.button.connect.success","Connected Successful.");
+                        connectedShowStatus(true,CONN_MSG);
                         InitialDappFrame.getContext().showStep(InitialDappFrame.InitDappSteps.setDapp);
                     }catch (IPFSInitialException exception){
                         connecting.set(false);

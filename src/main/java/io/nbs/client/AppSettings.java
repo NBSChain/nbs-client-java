@@ -365,6 +365,14 @@ public class AppSettings {
         }
     }
 
+    public String getBaseGatewayUrl(){
+        try{
+            return getAddressGatewayBaseUrl();
+        }catch (Exception e){
+            throw new RuntimeException(e.getCause());
+        }
+    }
+
     private String spliceAddressApi(String host,String port,String portocol){
         StringBuffer baseBuf =new StringBuffer();
         baseBuf.append(portocol).append("://").append(host).append(":").append(port).append("/api/v0/");
