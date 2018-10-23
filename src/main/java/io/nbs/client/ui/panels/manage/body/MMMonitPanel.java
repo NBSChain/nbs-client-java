@@ -96,9 +96,6 @@ public class MMMonitPanel extends JPanel {
      * @return {[type]} [description]
      */
     private void initComponents() {
-
-       // int maxWidth = (int)(MainFrame.getContext().currentWindowWidth*0.375);
-       // textArea = new SizeAutoAdjustTextArea(maxWidth);
         wantListPanel = new JPanel();
         middlePanel = new JPanel();
         timelabel = new LCJlabel();

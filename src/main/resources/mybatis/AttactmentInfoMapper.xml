@@ -32,7 +32,7 @@
     </select>
 
     <select id="findAll" resultMap="BaseResultMap">
-        SELECT * FROM attac_info
+        SELECT * FROM attac_info ORDER BY ctime DESC
     </select>
 
     <select id="find" resultMap="BaseResultMap" statementType="STATEMENT" parameterType="map">

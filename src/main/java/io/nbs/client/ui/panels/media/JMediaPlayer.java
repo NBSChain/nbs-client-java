@@ -1,6 +1,7 @@
 package io.nbs.client.ui.panels.media;
 
 import io.nbs.client.Launcher;
+import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.frames.MainFrame;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -35,6 +38,7 @@ public class JMediaPlayer extends JPanel {
 
     private String currentHash;
     private PlayerThread player;
+    private JLabel stopButton;
 
     public JMediaPlayer(){
         context = this;
@@ -45,7 +49,10 @@ public class JMediaPlayer extends JPanel {
 
     private void initComponents(){
         this.setLayout(new BorderLayout());
-        this.add(webBrowser);
+        stopButton = new JLabel("stop");
+        stopButton.setFont(FontUtil.getDefaultFont(20));
+        this.add(webBrowser,BorderLayout.CENTER);
+        this.add(stopButton,BorderLayout.SOUTH);
     }
 
     private void initView(){
@@ -53,7 +60,26 @@ public class JMediaPlayer extends JPanel {
     }
 
     private void setListeners(){
+        stopButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                logger.info("stop video");
+                if(engine!=null){
+                    String scripts = "(function(window,document) {" +
+                            "var videos = document.getElementsByTagName('video');" +
+                            "   if(vedios&& vedios[0]){ " +
+                            "       vedios[0].pause();" +
+                            "   }" +
+                            "})(window,document)";
+                    engine.executeScript(scripts);
+                }
+            }
+        });
+    }
 
+    private static Object addJQurey(final WebEngine engine,String minVersion,String jqueryLoction,String scripts){
+        //TODO
+        return null;
     }
 
     /**
@@ -175,7 +201,7 @@ public class JMediaPlayer extends JPanel {
 
         public void interrupt(){
             try{
-                ThreadGroup tg = super.getThreadGroup();
+
                 if(root!=null && view != null){
                     root.getChildren().remove(view);
                 }

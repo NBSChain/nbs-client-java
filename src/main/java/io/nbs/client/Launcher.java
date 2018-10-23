@@ -19,6 +19,7 @@ import io.nbs.commons.utils.IconUtil;
 import io.nbs.sdk.constants.ConfigKeys;
 import io.nbs.sdk.prot.IPMParser;
 import io.nbs.sdk.prot.NodeDataConvertHelper;
+import javafx.application.Application;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -530,4 +531,5 @@ public class Launcher {
     public ImageIcon getSettingsIcon() {
         return settingsIcon;
     }
+
 }

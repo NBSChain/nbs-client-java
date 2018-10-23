@@ -9,6 +9,7 @@ import io.nbs.client.ui.components.*;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.holders.ViewHolder;
 import io.nbs.client.ui.panels.manage.listener.FillDetailInfoListener;
+import io.nbs.client.ui.panels.media.MediaPlayerView;
 import io.nbs.client.vo.AttachmentDataDTO;
 import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.commons.utils.IconUtil;
@@ -154,7 +155,11 @@ public abstract class AttachDataViewHolder extends ViewHolder {
                     AttachmentDataDTO m = (AttachmentDataDTO)o;
                     if(StringUtils.isNotBlank(m.getId())){
                         //内部open
-                        MainFrame.getContext().openLoadHashMedia(m.getId());
+                        //MainFrame.getContext().openLoadHashMedia(m.getId());
+                        String title = StringUtils.isNotBlank(m.getFname()) ? m.getFname(): m.getId();
+                        //new DialogPlayer(m.getId(),title).setVisible(true);
+                        MediaPlayerView.launcher(m.getId(),title);
+                        // playerView = new MediaPlayerView(m.getId(),title);
                         /* browser open */
 //                        String hash = m.getId();
 //                        java.net.URI uri = java.net.URI.create(urlBase+ hash);
@@ -180,6 +185,8 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         });
 
     }
+
+
 
 
 
