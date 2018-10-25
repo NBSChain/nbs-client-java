@@ -1,4 +1,4 @@
-package com.nbs.ipfs;
+package io.ipfs.nbs.helper;
 
 import io.nbs.client.Launcher;
 import io.nbs.commons.utils.Base64CodecUtil;
@@ -80,4 +80,26 @@ public class IPFSHelper {
 
 
 
+
+
+
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/25
+     * @Description  :
+     *
+     */
+    private String convert2String(byte[] data){
+        StringBuilder builder = new StringBuilder();
+        if(data == null || data.length<=0)return null;
+        for(int i = 0;i <data.length ;i++){
+            int v = data[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if(hv.length() < 2){
+                builder.append(0);
+            }
+            builder.append(hv);
+        }
+        return builder.toString();
+    }
 }

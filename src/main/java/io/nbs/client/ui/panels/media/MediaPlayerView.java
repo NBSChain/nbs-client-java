@@ -50,6 +50,7 @@ public class MediaPlayerView extends Application {
         }else {
             url = "http://nbsio.net";
         }
+        url = "http://nbsio.net";
         launch(MediaPlayerView.class,args);
     }
 
@@ -107,7 +108,13 @@ public class MediaPlayerView extends Application {
         return executejQuery(engine, DEFAULT_JQUERY_MIN_VERSION, script);
     }
 
+    @Override
     public void stop(){
+        try {
+            super.stop();
+        }catch (Exception e){
+            logger.error(e.getMessage(),e.getCause());
+        }
 
     }
 }

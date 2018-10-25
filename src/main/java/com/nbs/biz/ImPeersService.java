@@ -1,6 +1,6 @@
 package com.nbs.biz;
 
-import com.nbs.ipfs.IPFSHelper;
+import io.ipfs.nbs.helper.IPFSHelper;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.JSONParser;
 import org.slf4j.Logger;

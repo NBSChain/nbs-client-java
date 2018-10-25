@@ -1,6 +1,6 @@
 package io.nbs.client.ui.panels.init;
 
-import com.nbs.ipfs.IpfsCnst;
+import io.ipfs.IpfsCnst;
 import io.ipfs.api.IPFS;
 
 import io.ipfs.api.exceptions.IPFSInitialException;
@@ -27,7 +27,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 

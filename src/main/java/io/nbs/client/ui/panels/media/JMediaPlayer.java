@@ -65,6 +65,7 @@ public class JMediaPlayer extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 logger.info("stop video");
                 if(engine!=null){
+                    Platform.exit();
                     String scripts = "(function(window,document) {" +
                             "var videos = document.getElementsByTagName('video');" +
                             "   if(vedios&& vedios[0]){ " +
@@ -72,6 +73,7 @@ public class JMediaPlayer extends JPanel {
                             "   }" +
                             "})(window,document)";
                     engine.executeScript(scripts);
+
                 }
             }
         });

@@ -9,7 +9,7 @@ import io.nbs.client.services.IpfsMessageSender;
 import io.nbs.client.vo.ContactsItem;
 import com.nbs.entity.PeerBoradcastInfo;
 import com.nbs.entity.PeerInfoBase;
-import com.nbs.ipfs.IPFSHelper;
+import io.ipfs.nbs.helper.IPFSHelper;
 import com.nbs.ipfs.entity.IpfsMessage;
 import io.nbs.commons.helper.DateHelper;
 import io.nbs.client.adapter.ContactsItemAdapter;

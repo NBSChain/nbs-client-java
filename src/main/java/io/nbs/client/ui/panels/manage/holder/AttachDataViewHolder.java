@@ -49,6 +49,8 @@ public abstract class AttachDataViewHolder extends ViewHolder {
 
     public LCAttachMessageBubble messageBubble;
 
+    private DialogPlayer dialogPlayer;
+
     public AttachDataViewHolder() {
         initComponents();
         setListeners();
@@ -95,8 +97,6 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         sizeLabel.setFont(FontUtil.getDefaultFont(12));
         sizeLabel.setHorizontalAlignment(JLabel.LEFT);
         sizeLabel.setForeground(ColorCnst.FONT_ABOUT_TITLE_BLUE);
-
-
     }
 
     private void setListeners(){
@@ -154,11 +154,20 @@ public abstract class AttachDataViewHolder extends ViewHolder {
                 if(o!=null&& o instanceof AttachmentDataDTO){
                     AttachmentDataDTO m = (AttachmentDataDTO)o;
                     if(StringUtils.isNotBlank(m.getId())){
+                        //检测 file type
+
                         //内部open
                         //MainFrame.getContext().openLoadHashMedia(m.getId());
                         String title = StringUtils.isNotBlank(m.getFname()) ? m.getFname(): m.getId();
-                        //new DialogPlayer(m.getId(),title).setVisible(true);
-                        MediaPlayerView.launcher(m.getId(),title);
+                        if(dialogPlayer == null){
+                            dialogPlayer = new DialogPlayer(m.getId(),title);
+                            dialogPlayer.load().setVisible(true);
+                        }else {
+                            //dialogPlayer.stop();
+                            dialogPlayer.load(m.getId(),title).setVisible(true);
+                        }
+
+                        //MediaPlayerView.launcher(m.getId(),title);
                         // playerView = new MediaPlayerView(m.getId(),title);
                         /* browser open */
 //                        String hash = m.getId();

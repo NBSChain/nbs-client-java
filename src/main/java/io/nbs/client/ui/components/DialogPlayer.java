@@ -3,21 +3,21 @@ package io.nbs.client.ui.components;
 import io.nbs.client.Launcher;
 import io.nbs.client.ui.frames.MainFrame;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker;
+
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.lang.management.ThreadMXBean;
 
 /**
  * Copyright © 2015-2020 NBSChain Holdings Limited.
@@ -30,56 +30,147 @@ import java.awt.*;
  */
 public class DialogPlayer extends JDialog {
     private final static Logger logger = LoggerFactory.getLogger(DialogPlayer.class);
+
     private String name;
     private String hash;
     private Container container;
     private final JFXPanel webBrowser = new JFXPanel();
-    private static Group root;
-    private static WebView view;
-    private static WebEngine engine;
+    private static int width = 0;
+    private static int height = 0;
+    private static PlayerRunable playerRunable;
+    private JLabel button;
+
+
+
     public DialogPlayer (String hash,String name){
         super(MainFrame.getContext(),name,false);
         container = getContentPane();
         this.hash = hash;
         this.name = name;
         initComponets();
+        setListeners();
     }
 
     private void initComponets(){
         this.setBounds(MainFrame.getContext().getBounds());
-        int width = getWidth();
-        int height = getHeight();
+        width = getWidth();
+        height = getHeight();
         container.setLayout(new BorderLayout());
-        String url = Launcher.appSettings.getGatewayURL(hash);
-        final Stage stage;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                root = new Group();
-                Scene scene = new Scene(root,width,height);
-                webBrowser.setScene(scene);
-                webBrowser.setLayout(new BorderLayout());
-                view = new WebView();
-                view.setMinSize(width,height);
-                view.setPrefSize(width,height);
-                engine = view.getEngine();
-                engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
-                        logger.info(observable.toString());
-                        if(newValue == Worker.State.SUCCEEDED){
-                            Document document = engine.getDocument();
-                            logger.info("Page:{}",document.getXmlEncoding());
-                        }else {
+        container.add(webBrowser,BorderLayout.CENTER);
+        button = new JLabel("TEST");
+        container.add(button,BorderLayout.SOUTH);
+    }
 
-                        }
+    private void setListeners(){
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
+
+                Thread[] threads = new Thread[threadGroup.activeCount()];
+                threadGroup.enumerate(threads,true);
+                for(Thread thread : threads){
+                    logger.info("thread name-id - state: {} - {}- {}",thread.getName(),thread.getId(),thread.getState().name());
+                    if(thread.getName().startsWith("JFXMedia Player")||thread.getName().startsWith("JavaFX Application")){
+
+                        logger.info("stop thread player : {}",thread.getName());
+                        thread.interrupt();
+
+                        Platform.exit();
+
                     }
-                });
-                engine.load(url);
-                root.getChildren().add(view);
+                    if(thread.isAlive()){
+                        logger.info(">>>>>>:{}-{}-{}",thread.getName(),thread.isAlive(),thread.getState().name());
+                    }
+                }
+                logger.info(">>>>>>>>>.threadGroup: {}-activeNum:{}",threadGroup.getName(),threadGroup.activeGroupCount());
             }
         });
-        container.add(webBrowser,BorderLayout.CENTER);
+    }
 
+    private boolean findPlayer(Thread thread){
+        ThreadGroup tg = thread.getThreadGroup();
+        Thread[] threads = new Thread[tg.activeGroupCount()];
+        tg.enumerate(threads,true);
+        return true;
+    }
+
+    public DialogPlayer load(String hash,String name){
+        //if(this.hash.equals(hash))return this;
+        this.hash = hash;
+        this.name = name;
+        String url = Launcher.appSettings.getGatewayURL(hash);
+        playerRunable = new PlayerRunable(url);
+        Platform.runLater(playerRunable);
+        return this;
+    }
+
+    public DialogPlayer load(){
+        this.load(this.hash,this.name);
+        return this;
+    }
+
+    public DialogPlayer reload(){
+        if(playerRunable!=null)playerRunable.relaod();
+        return this;
+    }
+
+    public DialogPlayer stop(){
+        if(playerRunable!=null){
+            playerRunable.stopPlayer();
+            Platform.setImplicitExit(true);
+        }
+        return this;
+    }
+
+    public class PlayerRunable implements Runnable{
+        private final static String PLAYER_THREAD_NAME = "nbs-player";
+//        private Group root;
+//        private WebView view;
+//        private WebEngine engine;
+        private String url;
+        private String preUrl;
+        public PlayerRunable(String url){
+            this.url = url;
+        }
+        @Override
+        public void run() {
+    /*        root = new Group();
+            Scene scene = new Scene(root,width,height);
+            webBrowser.setScene(scene);
+            webBrowser.setLayout(new BorderLayout());
+            view = new WebView();
+            view.setMinSize(width,height);
+            view.setPrefSize(width,height);
+            engine = view.getEngine();
+            engine.load("http://www.nbsio.net");
+            preUrl = url;
+            engine.load(url);
+            root.getChildren().add(view);*/
+            WebView webView = new WebView();
+            webBrowser.setScene(new Scene(webView));
+            webView.getEngine().load(url);
+        }
+
+        public boolean needCoverLoad(){
+            return (preUrl==null || preUrl.equalsIgnoreCase(url)) ? false : true;
+        }
+
+        public void relaod(){
+           // engine.reload();
+        }
+
+        public void stopPlayer(){
+           // engine.load("http://www.nbsio.net");
+        }
+
+        public PlayerRunable resetUrl(String url){
+            this.url = url;
+            return this;
+        }
+
+        public String getSignName() {
+            return PLAYER_THREAD_NAME;
+        }
     }
 }

@@ -1,6 +1,6 @@
 package io.nbs.client;
 
-import com.nbs.ipfs.IpfsCnst;
+import io.ipfs.IpfsCnst;
 import io.nbs.client.exceptions.AppInitializedException;
 import io.nbs.commons.helper.DateHelper;
 import io.nbs.commons.utils.RegexUtils;
@@ -120,6 +120,12 @@ public class AppSettings {
             is = new BufferedInputStream(new FileInputStream(file));
             reader = new InputStreamReader(is,"utf-8");
             props.load(reader);
+            if(!props.containsKey("ipfs.mm.address.api")){
+                props.setProperty("ipfs.mm.address.api","/ip4/${ipfs.mm.host}/tcp/${ipfs.mm.api-port}");
+            }
+            if(!props.containsKey("ipfs.mm.address.gateway")){
+                props.setProperty("ipfs.mm.address.gateway","${ipfs.mm.gateway.protocol}://${ipfs.mm.host}:${ipfs.mm.gateway-port}");
+            }
         }catch (IOException e){
             logger.error("load dapp properties error!",e.getCause());
         }finally {
