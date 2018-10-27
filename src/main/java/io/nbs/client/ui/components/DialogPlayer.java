@@ -2,8 +2,12 @@ package io.nbs.client.ui.components;
 
 import io.nbs.client.Launcher;
 import io.nbs.client.ui.frames.MainFrame;
+import io.nbs.client.ui.panels.media.JDialogWindowListener;
 import javafx.application.Platform;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -15,9 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.lang.management.ThreadMXBean;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Copyright © 2015-2020 NBSChain Holdings Limited.
@@ -31,19 +36,26 @@ import java.lang.management.ThreadMXBean;
 public class DialogPlayer extends JDialog {
     private final static Logger logger = LoggerFactory.getLogger(DialogPlayer.class);
 
+    private final static String scriptStr = "";
+
     private String name;
     private String hash;
     private Container container;
     private final JFXPanel webBrowser = new JFXPanel();
     private static int width = 0;
     private static int height = 0;
-    private static PlayerRunable playerRunable;
+
     private JLabel button;
+
+    private static DialogPlayer context;
+
 
 
 
     public DialogPlayer (String hash,String name){
         super(MainFrame.getContext(),name,false);
+        context = this;
+        //this.addWindowListener(new JDialogWindowListener());
         container = getContentPane();
         this.hash = hash;
         this.name = name;
@@ -56,36 +68,20 @@ public class DialogPlayer extends JDialog {
         width = getWidth();
         height = getHeight();
         container.setLayout(new BorderLayout());
+
         container.add(webBrowser,BorderLayout.CENTER);
         button = new JLabel("TEST");
         container.add(button,BorderLayout.SOUTH);
     }
 
     private void setListeners(){
-        button.addMouseListener(new MouseAdapter() {
+
+/*        button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                ThreadGroup threadGroup = Thread.currentThread().getThreadGroup();
-
-                Thread[] threads = new Thread[threadGroup.activeCount()];
-                threadGroup.enumerate(threads,true);
-                for(Thread thread : threads){
-                    logger.info("thread name-id - state: {} - {}- {}",thread.getName(),thread.getId(),thread.getState().name());
-                    if(thread.getName().startsWith("JFXMedia Player")||thread.getName().startsWith("JavaFX Application")){
-
-                        logger.info("stop thread player : {}",thread.getName());
-                        thread.interrupt();
-
-                        Platform.exit();
-
-                    }
-                    if(thread.isAlive()){
-                        logger.info(">>>>>>:{}-{}-{}",thread.getName(),thread.isAlive(),thread.getState().name());
-                    }
-                }
-                logger.info(">>>>>>>>>.threadGroup: {}-activeNum:{}",threadGroup.getName(),threadGroup.activeGroupCount());
+                stop.set(true);
             }
-        });
+        });*/
     }
 
     private boolean findPlayer(Thread thread){
@@ -100,7 +96,7 @@ public class DialogPlayer extends JDialog {
         this.hash = hash;
         this.name = name;
         String url = Launcher.appSettings.getGatewayURL(hash);
-        playerRunable = new PlayerRunable(url);
+        PlayerRunable playerRunable = new PlayerRunable(this,url);
         Platform.runLater(playerRunable);
         return this;
     }
@@ -110,67 +106,107 @@ public class DialogPlayer extends JDialog {
         return this;
     }
 
-    public DialogPlayer reload(){
-        if(playerRunable!=null)playerRunable.relaod();
-        return this;
-    }
 
-    public DialogPlayer stop(){
-        if(playerRunable!=null){
-            playerRunable.stopPlayer();
-            Platform.setImplicitExit(true);
-        }
-        return this;
+    public JLabel getButton() {
+        return button;
     }
 
     public class PlayerRunable implements Runnable{
         private final static String PLAYER_THREAD_NAME = "nbs-player";
-//        private Group root;
-//        private WebView view;
-//        private WebEngine engine;
         private String url;
         private String preUrl;
-        public PlayerRunable(String url){
+        private DialogPlayer dialogPlayer;
+        private WebEngine engine;
+        private AtomicBoolean runing = new AtomicBoolean(true);
+        private boolean flag = true;
+
+        public PlayerRunable(DialogPlayer dialogPlayer,String url){
+            this.dialogPlayer = dialogPlayer;
             this.url = url;
         }
         @Override
         public void run() {
-    /*        root = new Group();
+
+            Group root = new Group();
             Scene scene = new Scene(root,width,height);
             webBrowser.setScene(scene);
-            webBrowser.setLayout(new BorderLayout());
-            view = new WebView();
+
+            WebView view = new WebView();
             view.setMinSize(width,height);
             view.setPrefSize(width,height);
+
             engine = view.getEngine();
-            engine.load("http://www.nbsio.net");
-            preUrl = url;
-            engine.load(url);
-            root.getChildren().add(view);*/
-            WebView webView = new WebView();
-            webBrowser.setScene(new Scene(webView));
-            webView.getEngine().load(url);
+            engine.setJavaScriptEnabled(true);
+
+            engine.getLoadWorker().stateProperty().addListener(
+                    new ChangeListener<Worker.State>() {
+                        @Override
+                        public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
+                            logger.info(">>>>{}-{}",observable.getValue(),newValue.name());
+
+                            if(newValue == Worker.State.SUCCEEDED){
+                                logger.info("load event: {}");
+                                dialogPlayer.getButton().addMouseListener(new MouseAdapter() {
+                                    @Override
+                                    public void mouseClicked(MouseEvent e) {
+                                        logger.info(">>>>>>>>>>>>>>>>>.test.................");
+                                        //engine.executeScript("document.body.style.backgroundColor=\"red\";");
+                                        Platform.exit();
+
+                                        runing.set(true);
+                                    }
+                                });
+                                //
+                                dialogPlayer.addWindowListener(new WindowAdapter() {
+                                    @Override
+                                    public void windowClosing(WindowEvent e) {
+                                        e.getWindow().dispose();
+                                        super.windowClosing(e);
+
+//                                        engine.load("");
+                                        logger.info(">>>>>>>>>>>>>>>>>.closing...............");
+                                        runing.set(true);
+                                        //engine.executeScript("document.body.style.backgroundColor=\"red\";");
+                                    }
+
+                                    @Override
+                                    public void windowActivated(WindowEvent e) {
+                                        super.windowActivated(e);
+                                        //engine.executeScript("document.body.style.backgroundColor=\"red\";");
+                                    }
+                                });
+
+                                new Thread(){
+
+                                }.start();
+                            }
+                        }
+                    }
+            );
+            view.getEngine().load(url);
+            root.getChildren().add(view);
         }
 
         public boolean needCoverLoad(){
             return (preUrl==null || preUrl.equalsIgnoreCase(url)) ? false : true;
         }
 
-        public void relaod(){
-           // engine.reload();
+        public AtomicBoolean getRuning() {
+            return runing;
         }
 
-        public void stopPlayer(){
-           // engine.load("http://www.nbsio.net");
+        public boolean isFlag() {
+            return flag;
         }
+    }
 
-        public PlayerRunable resetUrl(String url){
-            this.url = url;
-            return this;
-        }
 
-        public String getSignName() {
-            return PLAYER_THREAD_NAME;
+    public class mointorThread implements Runnable{
+
+        @Override
+        public void run() {
+
+
         }
     }
 }

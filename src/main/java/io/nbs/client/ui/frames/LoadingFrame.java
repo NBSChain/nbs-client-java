@@ -28,9 +28,6 @@ public class LoadingFrame extends JFrame {
     private JLabel loadinglabel;
     private JLabel tipLabel;
 
-
-    private static Point origin = new Point();
-
     public LoadingFrame(ImageIcon icon){
         loadinglabel = new JLabel(icon);
         tipLabel = new JLabel();

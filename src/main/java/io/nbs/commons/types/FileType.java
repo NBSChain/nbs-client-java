@@ -1,5 +1,6 @@
 package io.nbs.commons.types;
 
+import io.ipfs.api.exceptions.FileFormatUnSupportException;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -172,13 +173,13 @@ public enum  FileType {
         return value;
     }
 
-    public static FileType forValue(String fhv){
+    public static FileType forValue(String fhv) throws FileFormatUnSupportException {
         if(StringUtils.isBlank(fhv))return null;
         for(FileType type : FileType.values()){
             if(fhv.startsWith(type.value)){
                 return type;
             }
         }
-        return null;
+        throw new FileFormatUnSupportException("File data format not support.");
     }
 }

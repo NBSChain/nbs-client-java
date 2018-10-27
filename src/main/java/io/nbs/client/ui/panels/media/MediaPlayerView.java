@@ -2,15 +2,19 @@ package io.nbs.client.ui.panels.media;
 
 import io.nbs.client.Launcher;
 import javafx.application.Application;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+
 
 /**
  * Copyright © 2015-2020 NBSChain Holdings Limited.
@@ -21,7 +25,7 @@ import org.w3c.dom.Document;
  * Author   : lanbery
  * Created  : 2018/10/23
  */
-public class MediaPlayerView extends Application {
+public class MediaPlayerView extends Application  {
     private static final Logger logger = LoggerFactory.getLogger(MediaPlayerView.class);
     public static final String DEFAULT_JQUERY_MIN_VERSION = "1.7.2";
     public static final String JQUERY_LOCATION = "http://code.jquery.com/jquery-1.7.2.min.js";
@@ -29,12 +33,17 @@ public class MediaPlayerView extends Application {
     public static String title;
     public static String url;
     private static WebEngine engine;
+    private static MediaPlayerView context;
+    private Stage primaryStage;
 /*    public MediaPlayerView(String hash,String name){
         this.hash = hash;
         this.title = name;
     }*/
+    public MediaPlayerView(){
+        context = this;
+    }
 
-    public static void launcher(String... args){
+    public static MediaPlayerView launcher(String... args){
         if(args.length==1){
             hash = args[0];
             title = args[0];
@@ -50,12 +59,25 @@ public class MediaPlayerView extends Application {
         }else {
             url = "http://nbsio.net";
         }
-        url = "http://nbsio.net";
+        //url = "http://nbsio.net";
         launch(MediaPlayerView.class,args);
+
+        return context;
+    }
+
+    public MediaPlayerView showFrame(){
+        try{
+            this.start(primaryStage);
+        }catch (Exception e){
+
+            logger.info(e.getMessage(),e.getCause());
+        }
+       return context;
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        this.primaryStage = primaryStage;
         final WebView webView = new WebView();
         engine = webView.getEngine();
         logger.info(url);
@@ -64,11 +86,25 @@ public class MediaPlayerView extends Application {
             @Override public void changed(ObservableValue<? extends Document> prop, Document oldDoc, Document newDoc) {
                 executejQuery(
                         engine,
-                        "$(\"a\").click(function(event){" +
+                        "$(\"media\").click(function(event){" +
                                 "  event.preventDefault();" +
-                                "  $(this).hide(\"slow\");" +
+                                "  $(this).pause = \"true\";" +
                                 "});"
                 );
+            }
+        });
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                logger.info(">>>>>>>>>>>>>>>>>>..>>>>>>>>>>>>>>...........");
+                String script = "var $()";
+                engine.executeScript("" +
+                        " var myVideo = document.getElementsByTagName(\"video\")[0];" +
+                        " if(myVideo)myVideo.pause();");
+                logger.info(">>>>>>>>>>>>>>>>>>..>>>>>>>>>>>>>>...........");
+
+               // context.executejQuery(engine,script);
             }
         });
         primaryStage.setScene(new Scene(webView));
@@ -117,4 +153,5 @@ public class MediaPlayerView extends Application {
         }
 
     }
+
 }

@@ -1,6 +1,11 @@
 package io.ipfs.nbs.helper;
 
+import io.ipfs.api.exceptions.FileFormatUnSupportException;
+import io.ipfs.api.exceptions.IllegalFormatException;
+import io.ipfs.multiaddr.MultiAddress;
+import io.ipfs.multihash.Multihash;
 import io.nbs.client.Launcher;
+import io.nbs.commons.types.FileType;
 import io.nbs.commons.utils.Base64CodecUtil;
 import io.ipfs.api.IPFS;
 import io.nbs.sdk.constants.ConfigKeys;
@@ -79,8 +84,36 @@ public class IPFSHelper {
     }
 
 
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/25
+     * @Description  :
+     *
+     */
+    public Multihash fromHash58(String hash58) throws IllegalFormatException {
+        if(StringUtils.isBlank(hash58))throw new IllegalFormatException("input hash58 string error.");
+        try{
+            return  Multihash.fromBase58(hash58);
+        }catch (RuntimeException re){
+            throw new IllegalFormatException("input hash58 string error.");
+        }
+    }
 
 
+    public FileType getTypeFromHash(String hash) throws FileFormatUnSupportException {
+        try{
+            Multihash multihash = fromHash58(hash);
+            byte[] data = ipfs.object.data(multihash);
+
+            String tem = new String(data,0,28,"utf-8");
+            logger.info(tem);
+            return FileType.forValue(convert2String(data));
+        }catch (IllegalFormatException ife){
+            throw new FileFormatUnSupportException(ife.getMessage(),ife.getCause());
+        }catch (IOException ioe){
+            throw new FileFormatUnSupportException(ioe.getMessage(),ioe.getCause());
+        }
+    }
 
 
     /**
@@ -91,8 +124,8 @@ public class IPFSHelper {
      */
     private String convert2String(byte[] data){
         StringBuilder builder = new StringBuilder();
-        if(data == null || data.length<=0)return null;
-        for(int i = 0;i <data.length ;i++){
+        if(data == null || data.length<=27)return null;
+        for(int i = 0;i < 28 ;i++){
             int v = data[i] & 0xFF;
             String hv = Integer.toHexString(v);
             if(hv.length() < 2){
@@ -100,6 +133,7 @@ public class IPFSHelper {
             }
             builder.append(hv);
         }
+        logger.info("DATA:{}",builder.toString().toUpperCase());
         return builder.toString();
     }
 }

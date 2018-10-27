@@ -10,6 +10,7 @@ import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.exceptions.AppInitializedException;
 import io.nbs.client.ui.frames.*;
+import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.commons.helper.RadomCharactersHelper;
 import io.nbs.commons.utils.Base64CodecUtil;
 import io.nbs.sdk.beans.NodeBase;
@@ -531,5 +532,7 @@ public class Launcher {
     public ImageIcon getSettingsIcon() {
         return settingsIcon;
     }
+
+
 
 }
