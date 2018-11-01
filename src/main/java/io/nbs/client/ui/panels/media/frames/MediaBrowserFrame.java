@@ -69,6 +69,7 @@ public class MediaBrowserFrame extends JFrame {
         UIManager.put("Panel.background", ColorCnst.WINDOW_BACKGROUND);
         UIManager.put("CheckBox.background", ColorCnst.WINDOW_BACKGROUND);
 
+        this.statusPanel.setBackground(ColorCnst.DARK);
         if(OSUtil.getOsType() != OSUtil.Mac_OS){
             String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
             setUndecorated(true);//隐藏标题栏

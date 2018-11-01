@@ -44,7 +44,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
     }
 
     private void initComponents(){
-
+        webBrowser.setLayout(new BorderLayout());
     }
 
     private void initView(){

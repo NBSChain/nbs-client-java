@@ -14,6 +14,7 @@ import io.nbs.client.ui.components.VerticalFlowLayout;
 import io.nbs.client.ui.components.forms.LCFormLabel;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
+import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.commons.helper.DateHelper;
 import io.nbs.commons.utils.DataSizeFormatUtil;
 import net.miginfocom.swing.MigLayout;
@@ -190,10 +191,13 @@ public class TipResultHashPanel extends ParentAvailablePanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 monitPanel.monitorList();
-                logger.info("客户端IP:{}打开浏览器时间:{},浏览HASH:{}",MainFrame.getContext().getCurrentPeer().getIp(),DateHelper.currentTime(),hash58);
+                logger.info("TipResultHashPanel 客户端IP:{}打开浏览器时间:{},浏览HASH:{}"
+                        ,MainFrame.getContext().getCurrentPeer().getIp(),DateHelper.currentTime(),hash58);
                 if(StringUtils.isNotBlank(hash58)){
                     String title =hash58;
-                    new DialogPlayer(hash58,title).setVisible(true);
+                    MediaBrowserFrame browserFrame = new MediaBrowserFrame(title,title);
+                    browserFrame.setVisible(true);
+                    //new DialogPlayer(hash58,title).setVisible(true);
                 }
 
                 //BrowserOperationHelper.getInstance().openURL(hash58);

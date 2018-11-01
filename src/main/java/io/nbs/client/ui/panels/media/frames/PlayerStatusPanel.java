@@ -7,7 +7,6 @@ import io.nbs.commons.utils.IconUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.geom.Line2D;
 
@@ -24,6 +23,7 @@ public class PlayerStatusPanel extends JPanel {
     private ImageIcon loadingbar;
     private JLabel loaingLabel;
     private JLabel statusLabel;
+    private static int status_H = 28;
 
     private HorLine horLine;
 
@@ -34,28 +34,31 @@ public class PlayerStatusPanel extends JPanel {
     }
 
     private void initComponents(){
-        horLine = new HorLine(ColorCnst.RED);
+        horLine = new HorLine(ColorCnst.FONT_GRAY_DARKER);
+        horLine.setBackground(ColorCnst.FONT_GRAY_DARKER);
         horLine.setBorder(null);
 
         loaingLabel = new JLabel(this.loadingbar);
         loaingLabel.setHorizontalAlignment(JLabel.LEFT);
+        loaingLabel.setMinimumSize(new Dimension(320,status_H));
 
         statusLabel = new JLabel("Loading...");
         statusLabel.setHorizontalAlignment(JLabel.RIGHT);
         statusLabel.setFont(FontUtil.getDefaultFont(10));
-        statusLabel.setForeground(ColorCnst.FONT_ABOUT_TITLE_BLUE);
+        statusLabel.setForeground(ColorCnst.FONT_WHITE);
     }
 
     private void initView(){
         this.setLayout(new BorderLayout());
         JPanel showPanel = new JPanel();
         showPanel.setLayout(new GridBagLayout());
+        showPanel.setBackground(ColorCnst.DARK);
 //        this.add(horLine,
 //                new GBC(0,0).setFill(GBC.HORIZONTAL).setWeight(800,1).setInsets(0,0,0,0));
         showPanel.add(loaingLabel,
                 new GBC(0,0).setFill(GBC.HORIZONTAL).setWeight(75,1).setInsets(0,5,0,0));
         showPanel.add(statusLabel,
-                new GBC(1,0).setFill(GBC.HORIZONTAL).setWeight(25,1).setInsets(0,5,0,5));
+                new GBC(1,0).setFill(GBC.BOTH).setWeight(25,1).setInsets(0,5,0,5));
 
         this.add(horLine,BorderLayout.CENTER);
         this.add(showPanel,BorderLayout.SOUTH);

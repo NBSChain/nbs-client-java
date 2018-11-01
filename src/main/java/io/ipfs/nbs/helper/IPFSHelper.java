@@ -105,8 +105,8 @@ public class IPFSHelper {
             Multihash multihash = fromHash58(hash);
             byte[] data = ipfs.object.data(multihash);
 
-            String tem = new String(data,0,28,"utf-8");
-            logger.info(tem);
+//            String tem = new String(data,0,28,"utf-8");
+//            logger.info(tem);
             return FileType.forValue(convert2String(data));
         }catch (IllegalFormatException ife){
             throw new FileFormatUnSupportException(ife.getMessage(),ife.getCause());
