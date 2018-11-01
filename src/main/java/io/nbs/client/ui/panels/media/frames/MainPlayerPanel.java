@@ -35,6 +35,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
     private final JFXPanel webBrowser = new JFXPanel();
     private static Group root;
     private static WebView view;
+    private static WebEngine engine;
 
     private BrowserThread browserThread;
     private static MainPlayerPanel context;
@@ -86,7 +87,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
             super.run();
             root = new Group();
             root.setAutoSizeChildren(true);
-            Scene scene = new Scene(root);
+            Scene scene = new Scene(root,width,height);
             webBrowser.setScene(scene);
             view = new WebView();
             view.setMinSize(width,height);
@@ -160,15 +161,15 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
 
     @Override
     public void resize() {
-        Rectangle rect = getBounds();
-        int cW = rect.width;
-        int cH = rect.height;
+
+        int cW = browserFrame.currentWindowWidth;
+        int cH = browserFrame.currentWindowHeight - MediaBrowserFrame.TH_SIZE - PlayerStatusPanel.status_H-6;
         if(view!=null){
-            webBrowser.setPreferredSize(new Dimension(cW,cH));
-            webBrowser.setBorder(ColorCnst.RED_BORDER);
+            //webBrowser.setPreferredSize(new Dimension(cW,cH));
+            //webBrowser.setBorder(ColorCnst.RED_BORDER);
             view.setPrefSize(new Integer(cW).doubleValue(),new Integer(cH).doubleValue());
-            Platform.runLater(new WebViewController(view,root,2));
-            webBrowser.updateUI();
+           // Platform.runLater(new WebViewController(view,root,2));
+           // webBrowser.updateUI();
         }
     }
 
@@ -211,10 +212,11 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                     Rectangle rect = context.getBounds();
                     double w = rect.getWidth();
                     double h = rect.getHeight();
+                    logger.info("resize===>>{}*{}",w,h);
                     root.setAutoSizeChildren(true);
-                    view.resize(w,h);
+                    view.setPrefSize(w,h);
                     //engine.getOnResized();
-                    engine.reload();
+                    //engine.reload();
                     break;
                 default:
                     return;

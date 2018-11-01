@@ -130,4 +130,21 @@ public class MediaBrowserFrame extends JFrame {
         }
     }
 
+    public int getCurrentWindowWidth() {
+        return currentWindowWidth;
+    }
+
+
+
+    public int getCurrentWindowHeight() {
+        return currentWindowHeight;
+    }
+
+
+    public void resizeBounds(Rectangle bounds){
+        if(bounds!=null){
+            this.currentWindowHeight = bounds.height;
+            this.currentWindowWidth = bounds.width;
+        }
+    }
 }

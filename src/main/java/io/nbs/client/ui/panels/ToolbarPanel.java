@@ -266,6 +266,7 @@ public class ToolbarPanel extends JPanel {
         imBTN = ButtonIconUtil.imBTN;
         dataBTN =ButtonIconUtil.dataBTN;
         musicBTN = ButtonIconUtil.musicBTN;
+        musicBTN.setVisible(false);
         aboutBTN = ButtonIconUtil.aboutBTN;
     }
 

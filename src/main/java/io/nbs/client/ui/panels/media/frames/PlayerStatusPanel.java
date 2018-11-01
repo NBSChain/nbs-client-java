@@ -23,7 +23,7 @@ public class PlayerStatusPanel extends JPanel {
     private ImageIcon loadingbar;
     private JLabel loaingLabel;
     private JLabel statusLabel;
-    private static int status_H = 28;
+    public static int status_H = 28;
 
     private HorLine horLine;
 

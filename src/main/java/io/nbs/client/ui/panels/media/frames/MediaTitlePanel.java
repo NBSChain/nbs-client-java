@@ -198,10 +198,12 @@ public class MediaTitlePanel extends JPanel {
         if(windowMax){
             browserFrame.setBounds(normalBounds);
             maxLabel.setIcon(maxIcon);
+            browserFrame.resizeBounds(normalBounds);
             windowMax = false;
         }else {
             browserFrame.setBounds(desktopBounds);
             maxLabel.setIcon(restoreIcon);
+            browserFrame.resizeBounds(desktopBounds);
             windowMax = true;
         }
     }
