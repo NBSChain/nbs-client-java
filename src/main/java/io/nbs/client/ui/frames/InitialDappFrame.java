@@ -207,4 +207,11 @@ public class InitialDappFrame extends JFrame {
         cardLayout.show(contentPanel,steps.name());
     }
 
+    public DappIPFSStepPanel getIpfsStepPanel() {
+        return ipfsStepPanel;
+    }
+
+    public DappBaseStepPanel getBaseStepPanel() {
+        return baseStepPanel;
+    }
 }

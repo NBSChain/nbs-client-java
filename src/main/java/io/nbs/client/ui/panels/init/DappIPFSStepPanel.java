@@ -613,4 +613,12 @@ public class DappIPFSStepPanel extends JPanel {
         tipGatewayLabel.updateUI();
         tipApiLabel.updateUI();
     }
+
+    public String getHostStr() {
+        return hostStr;
+    }
+
+    public int getApiPort() {
+        return Integer.parseInt(apiPort);
+    }
 }

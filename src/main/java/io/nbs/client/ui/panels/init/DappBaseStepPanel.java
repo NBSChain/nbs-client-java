@@ -384,13 +384,17 @@ public class DappBaseStepPanel extends JPanel {
             new Thread(()->{
                 File dlAvatar ;
                 List<MerkleNode> nodes;
-
+                IPFS ipfs1;
                 try{
+                    InitialDappFrame dappFrame = InitialDappFrame.getContext();
+                    DappIPFSStepPanel ipfsStepPanel = dappFrame.getIpfsStepPanel();
+                    ipfs1 = new IPFS(ipfsStepPanel.getHostStr(),ipfsStepPanel.getApiPort());
                     //上传前先压缩成标准200*200
                     File compressFile = imageHandler.compressAvatar(selectedFile);
 
                     NamedStreamable.FileWrapper fileWrapper = new NamedStreamable.FileWrapper(compressFile);
-                    nodes = ipfs.add(fileWrapper);
+
+                    nodes = ipfs1.add(fileWrapper);
                     avatar = nodes.get(0).hash.toBase58();
                     avatarName = selectedFile.getName();
                     String baseGwURL = Launcher.appSettings.getAddressGatewayBaseUrl();
