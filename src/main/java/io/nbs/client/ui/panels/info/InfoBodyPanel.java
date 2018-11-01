@@ -28,6 +28,8 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -71,12 +73,12 @@ public class InfoBodyPanel extends ParentAvailablePanel {
         PeerInfo current = getCurrent();
         String avatarName = current.getAvatarName();
         ImageIcon avatarIcon;
-        if(StringUtils.isBlank(avatarName)){
+//        if(StringUtils.isBlank(current.getAvatar())){
             avatarIcon = IconUtil.getIcon(this,"/images/nbs750.jpg",128,128);
-        }else {
-            String avatarPath = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),avatarName);
-            avatarIcon =  AvatarImageHandler.getInstance().getImageIconFromOrigin(new File(avatarPath),128);
-        }
+//        }else {
+//            String avatarPath = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),current.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
+//            avatarIcon =  AvatarImageHandler.getInstance().getImageIconFromOrigin(new File(avatarPath),128);
+//        }
         avatarLabel.setIcon(avatarIcon);
         avatarLabel.setBackground(ColorCnst.WINDOW_BACKGROUND_LIGHT);
 
@@ -102,9 +104,38 @@ public class InfoBodyPanel extends ParentAvailablePanel {
         peerIdField.setHorizontalAlignment(JTextField.LEFT);
         peerIdField.setEditable(false);
         peerIdField.setBackground(ColorCnst.WINDOW_BACKGROUND);
+    }
 
+    private void syncLoadAvatar(PeerInfo peer){
+        AvatarImageHandler imageHandler = AvatarImageHandler.getInstance();
+        if(StringUtils.isNotBlank(peer.getAvatar())&&ipfs!=null){
+            new Thread(){
+                @Override
+                public void run() {
+                    try{
+                        String urlPath = Launcher.appSettings.getGatewayURL(peer.getAvatar());
+                        URL url = new URL(urlPath);
+                        String path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),peer.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
+                        File avatarFile = new File(path);
+                        boolean b =false;
+                        if(avatarFile.isFile()&&avatarFile.exists()){
+                            b = true;
+                        }else {
+                            b = imageHandler.getFileFromIPFS(url,avatarFile);
+                        }
+                        if(b){
+                            ImageIcon icon = imageHandler.getImageIconFromOrigin(avatarFile,128);
+                            avatarLabel.setIcon(icon);
+                            avatarJPanel.updateUI();
+                            ImageIcon icon48 = imageHandler.getImageIconFromOrigin(avatarFile,48);
+                            MainFrame.getContext().refreshAvatar(icon48);
+                        }
+                    }catch (Exception e){
 
-
+                    }
+                }
+            }.start();
+        }
     }
 
     private void initView(){
@@ -129,6 +160,9 @@ public class InfoBodyPanel extends ParentAvailablePanel {
 
         add(locationsLabel);
         add(peerPanel);
+
+        //
+        syncLoadAvatar(getCurrent());
     }
     private void setListeners(){
         //头像事件
@@ -141,7 +175,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                avatarLabel.setCursor(MainFrame.handCursor);
+                avatarLabel.setCursor(AppGlobalCnst.HAND_CURSOR);
                 avatarLabel.setToolTipText("点击修改头像");
                 super.mouseEntered(e);
             }
@@ -177,14 +211,14 @@ public class InfoBodyPanel extends ParentAvailablePanel {
             @Override
             public void mouseEntered(MouseEvent e) {
                 nickLabel.setToolTipText("点击修改昵称");
-                nickLabel.setCursor(MainFrame.handCursor);
+                nickLabel.setCursor(AppGlobalCnst.HAND_CURSOR);
                 super.mouseEntered(e);
             }
         });
     }
 
     private PeerInfo getCurrent(){
-        return MainFrame.getContext().getCurrentPeer();
+        return Launcher.currentPeer;
     }
 
     /**
@@ -225,7 +259,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
                 try {
                     imageHandler.createContactsAvatar(file,hashFileName);
                     //BufferedImage image = ImageIO.read(file128);
-                    ImageIcon avatarIcon = AvatarImageHandler.getInstance().getAvatarScaleIcon(file128,128);
+                    ImageIcon avatarIcon = imageHandler.getAvatarScaleIcon(file128,128);
 
                     logger.info( file128.getAbsolutePath());
                     if(avatarIcon!=null){
@@ -233,7 +267,8 @@ public class InfoBodyPanel extends ParentAvailablePanel {
                         avatarLabel.setIcon(avatarIcon);
                         avatarLabel.validate();
                         avatarLabel.updateUI();
-                        MainFrame.getContext().refreshAvatar();
+                        //MainFrame.getContext().refreshAvatar();
+                        MainFrame.getContext().refreshAvatar(imageHandler.getImageIconFromOrigin(file128,48));
                     }
                 } catch (Exception e) {
                     logger.info(e.getMessage());

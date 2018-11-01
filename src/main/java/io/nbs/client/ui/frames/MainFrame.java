@@ -29,6 +29,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -101,7 +102,6 @@ public class MainFrame extends JFrame {
 
     private AboutMasterPanel aboutMasterPanel;
 
-    public static Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
 
     public MainFrame(PeerInfo peerInfo){
         context = this;
@@ -187,6 +187,7 @@ public class MainFrame extends JFrame {
         setSize(winDimension);
         setMinimumSize(winDimension);
 
+
         mainJPanel.setLayout(new BorderLayout());
         mainJPanel.add(toolbarPanel,BorderLayout.WEST);
 
@@ -223,6 +224,9 @@ public class MainFrame extends JFrame {
      * @param clType
      */
     public void mainWinShow(MainCardLayoutTypes clType){
+        if(clType!=MainCardLayoutTypes.MEDIA){
+            //this.mediaMasterPanel.destoryPlatform();
+        }
         cardLayout.show(mainCentetPanel,clType.name());
     }
     /**
@@ -250,8 +254,8 @@ public class MainFrame extends JFrame {
         this.currentPeer = currentPeer;
     }
 
-    public void refreshAvatar(){
-        toolbarPanel.refreshToolbarAvatar();
+    public void refreshAvatar(ImageIcon icon){
+        toolbarPanel.reloadAvatar(icon);
     }
 
     /**
@@ -312,4 +316,19 @@ public class MainFrame extends JFrame {
         INFO_REFREHING = false;
     }
 
+    public void loadMedia(String hash){
+        if(this.mediaMasterPanel!=null){
+            this.mediaMasterPanel.openAndLoadHash(hash);
+        }
+    }
+
+    public MediaMasterPanel getMediaMasterPanel() {
+        return mediaMasterPanel;
+    }
+
+    public MainFrame openLoadHashMedia(String hash){
+        mainWinShow(MainCardLayoutTypes.MEDIA);
+        loadMedia(hash);
+        return context;
+    }
 }

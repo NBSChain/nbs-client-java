@@ -34,6 +34,9 @@ public class AvatarImageHandler {
     private static final int DEFAULT_CONTACTS_THUMB_SIZE = 64;
     public static final String AVATAR_SUFFIX = ".png";
     private static AvatarImageHandler ourInstance = new AvatarImageHandler();
+    private static String FILE_SEPARATOR = System.getProperty("file.separator");
+    private static String CURRENT_DIR = System.getProperty("user.dir");
+
 
     public static AvatarImageHandler getInstance() {
         return ourInstance;
@@ -65,6 +68,7 @@ public class AvatarImageHandler {
         AVATAR_PROFILE_HOME = AppGlobalCnst.consturactPath(Launcher.appBasePath,"profile","avatars");
         AVATAR_ORIGIN_HOME = AppGlobalCnst.consturactPath(Launcher.appBasePath,"cache","avatars");
         AVATAR_CUSTOM_HOME = AppGlobalCnst.consturactPath(Launcher.appBasePath,"cache","avatars","custom");
+        initAvatarLocalDir();
     }
 
     /**
@@ -86,6 +90,7 @@ public class AvatarImageHandler {
 
         destFile = new File(AVATAR_CUSTOM_HOME);
         if(!destFile.exists())destFile.mkdirs();
+
     }
 
     /**
@@ -176,6 +181,8 @@ public class AvatarImageHandler {
         }
     }
 
+
+
     /**
      * 上传时
      * 创建用户头像 所有 转换为png
@@ -190,10 +197,26 @@ public class AvatarImageHandler {
          * 128*128
          */
         originName = originName.substring(0,originName.lastIndexOf("."))+AVATAR_SUFFIX;
-        String target128 = AppGlobalCnst.consturactPath(AVATAR_PROFILE_HOME,originName);
+        String target128 = consturactPath(AVATAR_PROFILE_HOME,originName);
         File targetFile128 = new File(target128);
         generateThumbScale(srcFile,targetFile128,DEFAULT_PROFILE_AVATAR_SIZE);
         return originName;
+    }
+
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/19
+     * @Description  :
+     * 压缩头像为标准文件
+     */
+    public File compressAvatar(File srcFile) throws Exception {
+        if(!srcFile.exists())throw new Exception("图片源不存在.");
+        String tmpBase = CURRENT_DIR+FILE_SEPARATOR+".tmp";
+        String tmpFileName = srcFile.getName().substring(0,srcFile.getName().lastIndexOf("."))+AVATAR_SUFFIX;
+        File tmpFile = new File(consturactPath(tmpBase,tmpFileName));
+        //if(!tmpFile.exists())tmpFile.mkdirs();
+        generateThumbScale(srcFile,tmpFile,DEFAULT_PROFILE_AVATAR_SIZE);
+        return tmpFile;
     }
 
     /**
@@ -343,7 +366,6 @@ public class AvatarImageHandler {
                 zipScale = size*1.0F/oriHeight;
                 nW = (int)(oriWidth*zipScale);
             }
-
             ImageIcon newIcon = new ImageIcon(AppGlobalCnst.consturactPath(AVATAR_CUSTOM_HOME,"f"+size,fineName));
             image.getScaledInstance(nW,nH,Image.SCALE_SMOOTH);
             newIcon.setImage(image);
@@ -352,6 +374,23 @@ public class AvatarImageHandler {
             e.printStackTrace();
             return null;
         }
+    }
 
+    /**
+     * 构造路径
+     * @param agrs
+     * @return
+     */
+    public String consturactPath(String... agrs){
+        StringBuilder sb = new StringBuilder();
+        int len = agrs.length;
+        for(int i=0;i<len;i++ ){
+            if(i==(len-1)){
+                sb.append(agrs[i]);
+            }else {
+                sb.append(agrs[i]).append(FILE_SEPARATOR);
+            }
+        }
+        return sb.toString();
     }
 }

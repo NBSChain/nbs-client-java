@@ -2,9 +2,7 @@ package io.nbs.client.ui.components;
 
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.OSUtil;
-import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.commons.utils.EmojiUtil;
-import com.vdurmont.emoji.EmojiParser;
 
 import javax.swing.*;
 import javax.swing.text.*;

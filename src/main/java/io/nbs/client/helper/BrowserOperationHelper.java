@@ -1,6 +1,7 @@
 package io.nbs.client.helper;
 
 import io.ipfs.multihash.Multihash;
+import io.nbs.client.Launcher;
 import io.nbs.commons.helper.ConfigurationHelper;
 
 import java.awt.*;
@@ -26,7 +27,7 @@ public class BrowserOperationHelper {
 
     private BrowserOperationHelper() {
         desktop = java.awt.Desktop.getDesktop();
-        GATEWAY_BASE = ConfigurationHelper.getInstance().getGateWayURL();
+        GATEWAY_BASE = Launcher.appSettings.getBaseGatewayUrl();
     }
 
     /**

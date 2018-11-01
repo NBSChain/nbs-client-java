@@ -1,35 +1,20 @@
 package io.nbs.client.ui.panels.info;
 
-import com.nbs.ipfs.IPFSHelper;
-import io.nbs.client.listener.AbstractMouseListener;
+import io.ipfs.nbs.helper.IPFSHelper;
 import io.ipfs.api.IPFS;
-import io.ipfs.api.MerkleNode;
-import io.ipfs.api.NamedStreamable;
-import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.helper.AvatarImageHandler;
-import io.nbs.commons.helper.ConfigurationHelper;
-import io.nbs.commons.utils.IconUtil;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.components.GBC;
 import io.nbs.client.ui.components.LCJlabel;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
-import io.nbs.sdk.prot.IPMParser;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * @Package : io.ipfs.nbs.ui.panels.info
@@ -97,12 +82,11 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
         JPanel rightPanel = new JPanel();
 
 
-
-
         /**
          * avatar
          */
-        String avatar128Path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),self.getAvatarName());
+        String avatar128Path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),self.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
+        logger.info("INFO avatar : {}",avatar128Path);
         ImageIcon avatar = AvatarImageHandler.getInstance().getImageIconFromOrigin(avatar128Path,200);
         avatarLabel.setIcon(avatar);
 
@@ -151,8 +135,6 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
     }
 
     private void setListeners(){
-
-
 
     }
 

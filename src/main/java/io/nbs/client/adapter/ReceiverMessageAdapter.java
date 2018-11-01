@@ -4,6 +4,7 @@ package io.nbs.client.adapter;
 import com.nbs.biz.data.entity.PeerMessageEntity;
 import com.nbs.biz.service.PeerMessageService;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.listener.IPFSSubscribeListener;
 import io.nbs.client.services.IpfsMessageSender;
 import io.nbs.client.ui.components.NbsListView;
@@ -49,7 +50,8 @@ public class ReceiverMessageAdapter implements IPFSSubscribeListener {
 
     @Override
     public void notifyRecvMessage(MessageItem item) {
-        PeerInfo peerInfo = MainFrame.getContext().getCurrentPeer();
+        PeerInfo peerInfo = Launcher.currentPeer;
+        //MainFrame.getContext().getCurrentPeer();
 
         if(item.getFrom().equals(peerInfo.getFrom())){
             // 未来忽略自己发的

@@ -1,21 +1,26 @@
 package io.nbs.client;
 
 import io.ipfs.api.IPFS;
+import io.ipfs.api.JSONParser;
+import io.ipfs.api.exceptions.IPFSInitialException;
 import io.ipfs.api.exceptions.IllegalIPFSMessageException;
 import io.ipfs.nbs.helper.IPAddressHelper;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
-import io.nbs.commons.helper.ConfigurationHelper;
+import io.nbs.client.exceptions.AppInitializedException;
+import io.nbs.client.ui.frames.*;
+import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
+import io.nbs.commons.helper.RadomCharactersHelper;
 import io.nbs.commons.utils.Base64CodecUtil;
-import io.nbs.commons.utils.TimeUtil;
+import io.nbs.sdk.beans.NodeBase;
 import io.nbs.sdk.beans.PeerInfo;
-import io.nbs.client.ui.frames.FailFrame;
-import io.nbs.client.ui.frames.InitialFrame;
-import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.commons.utils.DataBaseUtil;
 import io.nbs.commons.utils.IconUtil;
+import io.nbs.sdk.constants.ConfigKeys;
 import io.nbs.sdk.prot.IPMParser;
+import io.nbs.sdk.prot.NodeDataConvertHelper;
+import javafx.application.Application;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -24,8 +29,13 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Package : io.ipfs.app
@@ -45,6 +55,9 @@ public class Launcher {
     public static ImageIcon logo ;
     private static ProcessBuilder ipfsBuilder;
     private static Process ipfsProcess;
+
+    private ImageIcon loading;
+    private ImageIcon settingsIcon;
     /**
      * 文件基础路径
      * ${basedir}/.nbs/
@@ -59,12 +72,14 @@ public class Launcher {
      *
      */
     public static String userHome;
-    public static String CURRENT_DIR;
+    public static final String CURRENT_DIR;
     public static final String FILE_SEPARATOR;
     public static String DOWNLOAD_FILE_PATH;
-    private static ConfigurationHelper cfgHelper;
     private static boolean ipfsRuning = false;
     private static boolean cliStartFirst = true;
+    public static AppSettings appSettings;
+
+    public static final File temDir;
 
     private IPFS ipfs;
     /**
@@ -73,64 +88,71 @@ public class Launcher {
     private JFrame currentFrame;
 
     public static PeerInfo currentPeer;
+    private LoadingFrame loadingFrame;
 
     static {
         sqlSession = DataBaseUtil.getSqlSession();
         CURRENT_DIR = System.getProperty("user.dir");
         FILE_SEPARATOR = System.getProperty("file.separator");
+        temDir = new File(CURRENT_DIR+FILE_SEPARATOR+".tmp");
     }
 
     public Launcher(){
-        context = this;
-        logo = IconUtil.getIcon(this,"/icons/nbs.png");
-        cfgHelper = ConfigurationHelper.getInstance();
-
+        this(null);
     }
     public Launcher(String[] args){
         context = this;
-
-        /*if(args.length>0){
-
-        }*/
+        loading = IconUtil.getIcon(this,"/icons/loading.gif");
+        settingsIcon = IconUtil.getIcon(this,"/icons/settings.gif");
+        logo = IconUtil.getIcon(this,"/icons/nbs.png");
+        currentPeer = new PeerInfo();
+        appSettings = AppSettings.getInstance(args);
     }
 
 
     public void launch(){
+        loadingFrame = new LoadingFrame(settingsIcon);
+        loadingFrame.setVisible(true);
+        loadingFrame.setIconImage(logo.getImage());
         /**
          * 1.初始化目录
          */
         initialStartup();
+
+        boolean bootstrapOk = false;
+        String initMessage = "";
+        try {
+            bootstrapOk = appSettings.checkedBaseIPFSConfig();
+        }catch (AppInitializedException aie){
+            logger.warn(aie.getMessage());
+        }
+
         /**
          * 2.构建IPFS
          */
-        ipfs = null;
-
         try{
-            String apiURL = ConfigurationHelper.getInstance().getIPFSAddress();
-            ipfs =  new IPFS(apiURL);
-            checkedIPFSRunning();
-            if(ipfsRuning){
-                boolean first = needInitConfig(ipfs);
-                //first = true;
-                if(first){
-                    currentFrame = new InitialFrame(ipfs);
-                }else {
-                    currentFrame = new MainFrame(currentPeer);
-                    currentFrame.setVisible(true);
-                }
-            }else {
-                goFailFrame("您的 NBS 服务未启动,请检查.");
+            ipfs = new IPFS(appSettings.getHost(),appSettings.getApiPort());
+            //构建CurrentPeer
+            buildPeerInfo(currentPeer,ipfs);
+            bootstrapOk = true;
+            currentFrame = new MainFrame(currentPeer);
+            try{
+                fillFromid(ipfs);
+            }catch (IPFSInitialException iie){
+                //goto Fail
+                goFailFrame(appSettings.getConfigVolme("nbs.ipfs.pubsub.failure.msg","ipfs pubsub service startup fail."));
             }
+            hideLoadFrame();
         }catch (RuntimeException re){
-            cliStartFirst =false;
-            re.printStackTrace();
-            System.out.println(re.getMessage());
-            goFailFrame("您的 NBS 服务未启动,请检查.");
-        } catch (IOException e) {
-            cliStartFirst =false;
-            logger.error(e.getMessage());
-            goFailFrame("未能获取服务配置信息,请检查IPFS 服务是否已启动.");
+            logger.warn("初始化IPFS 失败{}",re.getMessage());
+            hideLoadFrame();
+            currentFrame = new InitialDappFrame("connected failure. host :"+ appSettings.getHost());
+        }catch (IOException ioe){
+            logger.warn("初始化Peer 失败 {}",ioe.getMessage());
+            hideLoadFrame();
+            currentFrame = new InitialDappFrame("connected failure. host :"+ appSettings.getHost());
         }
+
         currentFrame.setBackground(ColorCnst.WINDOW_BACKGROUND);
         currentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         if(OSUtil.getOsType()!=OSUtil.Mac_OS){
@@ -147,14 +169,40 @@ public class Launcher {
         currentFrame = new FailFrame(sb.toString());
     }
 
+    private void buildPeerInfo(PeerInfo info,IPFS ipfs) throws IOException{
+        if(info==null)info = new PeerInfo();
+        Map data = ipfs.id();
+        NodeBase nodeBase = NodeDataConvertHelper.convertFormID(data);
+        if(nodeBase==null)throw new IOException("获取PeerID 失败.");
+        info.setId(nodeBase.getID());
+        Map cfgMap = ipfs.config.show();
+        if(cfgMap.containsKey(ConfigKeys.nickname.key()))
+            info.setNick(cfgMap.get(ConfigKeys.nickname.key()).toString());
+        if(cfgMap.containsKey(ConfigKeys.avatarHash.key()))
+            info.setAvatar(cfgMap.get(ConfigKeys.avatarHash.key()).toString());
+        if(cfgMap.containsKey(ConfigKeys.avatarName.key()))
+            info.setAvatarName(cfgMap.get(ConfigKeys.avatarName.key()).toString());
+        if(cfgMap.containsKey(ConfigKeys.avatarSuffix.key()))
+            info.setAvatarSuffix(cfgMap.get(ConfigKeys.avatarSuffix.key()).toString());
+
+    }
+
+    private void hideLoadFrame(){
+        if(loadingFrame!=null){
+            loadingFrame.setVisible(false);
+            loadingFrame.dispose();
+        }
+    }
+
     /**
      *
      */
-    private void checkedIPFSRunning(){
+    private void checkedIPFSRunning() throws Exception{
         int checkTimes = 0;
-        while (!ipfsRuning&& checkTimes<20){
+        while (!ipfsRuning&& checkTimes<5){
             if(ipfs==null){
-                String apiURL = cfgHelper.getIPFSAddress();
+                String apiURL;
+                apiURL = appSettings.getAddressApiUrl();
                 try {
                     ipfs =  new IPFS(apiURL);
                 }catch (RuntimeException e){
@@ -185,9 +233,10 @@ public class Launcher {
 
     public void reStartMain(){
         //init IPFS and check
-        checkedIPFSRunning();
+
         boolean first = false;
         try {
+            checkedIPFSRunning();
             first = needInitConfig(ipfs);
             //first = true;
             if(first){
@@ -202,7 +251,7 @@ public class Launcher {
                 currentFrame.setIconImage(logo.getImage());
             }
             currentFrame.setVisible(true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
             destoryIPFS();
@@ -221,11 +270,11 @@ public class Launcher {
     private boolean needInitConfig(IPFS ipfs) throws IOException {
         Map cfg = ipfs.config.show();
         String peerid = (String)ipfs.id().get("ID");
-        if(cfg.containsKey(ConfigurationHelper.JSON_NICKNAME_KEY)
-                && cfg.containsKey(ConfigurationHelper.JSON_CFG_FROMID_KEY)){
-            Object nickObj = cfg.get(ConfigurationHelper.JSON_NICKNAME_KEY);
+        if(appSettings.containsKey(ConfigKeys.nickname.key())
+                && appSettings.containsKey(ConfigKeys.formid.key())){
+            Object nickObj = appSettings.getConfigVolme(ConfigKeys.nickname.key());
             String nick = IPMParser.urlDecode(nickObj.toString());
-            String fromid =  (String)cfg.get(ConfigurationHelper.JSON_CFG_FROMID_KEY);
+            String fromid =  (String)cfg.get(ConfigKeys.formid.key());
             if(StringUtils.isBlank(fromid)||StringUtils.isBlank(nick))return true;
             currentPeer = new PeerInfo();
             currentPeer.setId(peerid);
@@ -233,14 +282,14 @@ public class Launcher {
             //
             currentPeer.setFrom(fromid);
 
-            Object avatar = cfg.get(ConfigurationHelper.JSON_AVATAR_KEY);
-            Object avatarSuffix = cfg.get(ConfigurationHelper.JSON_AVATAR_SUFFIX_KEY);
+            Object avatar = appSettings.getConfigVolme(ConfigKeys.avatarHash.key());
+            Object avatarSuffix = appSettings.getConfigVolme(ConfigKeys.avatarSuffix.key());
             if(avatar!=null&&!avatar.toString().equals("")
                     &&avatarSuffix!=null&& !"".equals(avatarSuffix.toString())){
                 currentPeer.setAvatar(avatar.toString());
                 currentPeer.setAvatarSuffix(avatarSuffix.toString());
             }
-            Object avatarName = cfg.get(ConfigurationHelper.JSON_AVATAR_NAME_KEY);
+            Object avatarName = appSettings.getConfigVolme(ConfigKeys.avatarName.key());
             if(avatarName!=null){
                 String avatarFileName = IPMParser.urlDecode(avatarName.toString());
                 currentPeer.setAvatarName(avatarFileName);
@@ -260,16 +309,20 @@ public class Launcher {
         }
     }
 
+
+
     /**
      * 启动初始化
      */
     private void initialStartup(){
         userHome = System.getProperty("user.home");
         appBasePath = CURRENT_DIR+FILE_SEPARATOR+AppGlobalCnst.NBS_ROOT;
+        if(!temDir.exists()){//临时文件
+            temDir.mkdirs();
+        }
         /**
          * 初始化目录
          */
-
         DOWNLOAD_FILE_PATH = AppGlobalCnst.consturactPath(userHome,AppGlobalCnst.NBS_ROOT);
         File userFile = new File(DOWNLOAD_FILE_PATH);
         if(!userFile.exists()){
@@ -280,7 +333,6 @@ public class Launcher {
             appBaseFile.mkdirs();
         }
 
-        File appTempFile = new File(CURRENT_DIR+FILE_SEPARATOR+AppGlobalCnst.TEMP_FILE);
         if(!appBaseFile.exists()){
             appBaseFile.mkdirs();
         }
@@ -298,9 +350,8 @@ public class Launcher {
 
     public IPFS getIpfs() {
         if(ipfs ==null){
-            String apiURL = ConfigurationHelper.getInstance().getIPFSAddress();
             try{
-                ipfs =  new IPFS(apiURL);
+                ipfs =  new IPFS(appSettings.getHost(),appSettings.getApiPort());
             }catch (RuntimeException e){
                 logger.error("未能链接上IPFS服务，请检查服务是否已停止.");
             }
@@ -377,7 +428,7 @@ public class Launcher {
      * 退出时同时结束IPFS服务
      */
     public static void destoryIPFS(){
-        if(ipfsProcess!=null && cfgHelper.exitStopIPFS()){
+        if(ipfsProcess!=null && appSettings.getStatus("nbs.server.exit.stop")){
             ipfsProcess.destroy();
         }
     }
@@ -389,4 +440,99 @@ public class Launcher {
     public static String getSysUser(){
         return System.getProperty("user.name","");
     }
+
+    public void setIpfs(IPFS ipfs) {
+        this.ipfs = ipfs;
+    }
+
+    public PeerInfo getCurrentPeer() {
+        return currentPeer;
+    }
+
+    public static void setCurrentPeer(PeerInfo currentPeer) {
+        Launcher.currentPeer = currentPeer;
+    }
+
+    public void setCurrentFrame(JFrame currentFrame) {
+        this.currentFrame = currentFrame;
+    }
+
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/10/22
+     * @Description  :
+     * 填充ipfs pubsub fromid
+     */
+    public void fillFromid(IPFS ipfs) throws IPFSInitialException {
+        if(!appSettings.subWorldPeers())return;//未启用聊天模式
+        if(ipfs==null)throw new IPFSInitialException("IPFS 服务连接失败.");
+        if(currentPeer==null||currentPeer.getId()==null)throw new IPFSInitialException("请先设置IPFS Peer 信息");
+        AtomicBoolean geted = new AtomicBoolean(true);
+
+        try{
+            String fromid = ipfs.config.get(ConfigKeys.formid.key());
+            if(StringUtils.isNotBlank(fromid) && !fromid.equalsIgnoreCase("null")){
+                currentPeer.setFrom(fromid);
+                geted.set(false);
+            }else {
+                throw new IOException("no fromid");
+            }
+        }catch (IOException e){
+           //need set ipfs config
+            cycleTryFromid(geted);
+        }catch (RuntimeException re){
+            cycleTryFromid(geted);
+        }finally {
+            if(currentPeer.getFrom()==null)throw new IPFSInitialException("初始化IPFS消息失败.");
+        }
+    }
+
+    private void cycleTryFromid(AtomicBoolean geted){
+        int times = Launcher.appSettings.tryGetFromidTimes();
+        AtomicInteger counter = new AtomicInteger(0);//计数器
+        String tmpTopic = RadomCharactersHelper.getInstance().generated(currentPeer.getId(),4);
+        logger.info("get fromid topic : {}",tmpTopic);
+        while (geted.get()){
+            try{
+                Stream<Map<String,Object>> subs = ipfs.pubsub.sub(tmpTopic);
+                ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
+                ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
+                List<Map<String, Object>> lst = subs.limit(1).collect(Collectors.toList());
+                Object fromidObj = JSONParser.getValue(lst.get(0),"from");
+                logger.info(fromidObj.toString());
+                if(fromidObj!=null){
+                    String fromidStr = fromidObj.toString();
+                    String enfromid = Base64CodecUtil.encode(fromidStr);
+                    logger.info("fromid encode compare : {} -- {}",fromidStr,enfromid);
+                    ipfs.config.set(ConfigKeys.formid.key(),enfromid);
+                    currentPeer.setFrom(enfromid);
+                    geted.set(false);
+                }
+            }catch (Exception exception){
+                try{
+                    TimeUnit.SECONDS.sleep(2);
+                }catch (InterruptedException ie){
+                }
+                counter.set(counter.get()+1);
+                if(counter.get()>times){
+                    geted.set(false);
+                }
+            }
+        }
+    }
+
+    public ImageIcon getLoading() {
+        return loading;
+    }
+
+    public static ImageIcon getLogo() {
+        return logo;
+    }
+
+    public ImageIcon getSettingsIcon() {
+        return settingsIcon;
+    }
+
+
+
 }

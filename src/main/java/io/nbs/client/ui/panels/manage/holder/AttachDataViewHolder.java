@@ -1,24 +1,30 @@
 package io.nbs.client.ui.panels.manage.holder;
 
 import com.alibaba.fastjson.JSON;
+import io.ipfs.api.exceptions.FileFormatUnSupportException;
+import io.ipfs.nbs.helper.IPFSHelper;
 import io.nbs.client.Launcher;
+import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.components.*;
+
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.holders.ViewHolder;
 import io.nbs.client.ui.panels.manage.listener.FillDetailInfoListener;
+import io.nbs.client.ui.panels.media.MediaPlayerView;
+import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.client.vo.AttachmentDataDTO;
-import io.nbs.commons.helper.ConfigurationHelper;
+
+import io.nbs.commons.types.FileType;
 import io.nbs.commons.utils.IconUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
+
 import java.awt.event.*;
-import java.io.IOException;
 
 /**
  * @Package : io.nbs.client.ui.panels.manage.holder
@@ -46,6 +52,10 @@ public abstract class AttachDataViewHolder extends ViewHolder {
     public NBSIconButton downloadBtn;
 
     public LCAttachMessageBubble messageBubble;
+
+    private DialogPlayer dialogPlayer;
+
+    private MediaPlayerView mediaPlayerView;
 
     public AttachDataViewHolder() {
         initComponents();
@@ -81,7 +91,6 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         time.setForeground(ColorCnst.FONT_GRAY_DARKER);
         time.setFont(FontUtil.getDefaultFont(12));
 
-
         attachmentPanel.setOpaque(false);
 
         progressBar.setMaximum(100);
@@ -93,8 +102,6 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         sizeLabel.setFont(FontUtil.getDefaultFont(12));
         sizeLabel.setHorizontalAlignment(JLabel.LEFT);
         sizeLabel.setForeground(ColorCnst.FONT_ABOUT_TITLE_BLUE);
-
-
     }
 
     private void setListeners(){
@@ -112,7 +119,7 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                e.getComponent().setCursor(MainFrame.handCursor);
+                e.getComponent().setCursor(AppGlobalCnst.HAND_CURSOR);
                 super.mouseEntered(e);
             }
 
@@ -147,22 +154,28 @@ public abstract class AttachDataViewHolder extends ViewHolder {
         openBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String urlBase = ConfigurationHelper.getInstance().getGateWayURL();
+                String urlBase = Launcher.appSettings.getBaseGatewayUrl();
                 Object o = attachmentPanel.getTag();
                 if(o!=null&& o instanceof AttachmentDataDTO){
                     AttachmentDataDTO m = (AttachmentDataDTO)o;
                     if(StringUtils.isNotBlank(m.getId())){
-                        String hash = m.getId();
-                        java.net.URI uri = java.net.URI.create(urlBase+hash);
-                        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                        if(desktop.isSupported(Desktop.Action.BROWSE)){
-                            try {
-                                desktop.browse(uri);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                                logger.error(e1.getMessage());
-                            }
-                        }
+                        //检测 file type
+//
+//                        FileType fileType;
+//                        try{
+//                            fileType = IPFSHelper.getInstance().getTypeFromHash(m.getId());
+//                        }catch (FileFormatUnSupportException fe){
+//                            fileType = null;
+//                        }
+                        //内部open
+                        //MainFrame.getContext().openLoadHashMedia(m.getId());
+                        String title = StringUtils.isNotBlank(m.getFname()) ? m.getFname(): m.getId();
+
+
+                        /* frame */
+                        MediaBrowserFrame browserFrame = new MediaBrowserFrame(m.getId(),title);
+                        browserFrame.setVisible(true);
+
 
                     }
                 }
@@ -180,11 +193,13 @@ public abstract class AttachDataViewHolder extends ViewHolder {
 
 
 
+
+
     private class BaseBtnMouseAdapter extends MouseAdapter{
         @Override
         public void mouseEntered(MouseEvent e) {
             super.mouseEntered(e);
-            e.getComponent().setCursor(MainFrame.handCursor);
+            e.getComponent().setCursor(AppGlobalCnst.HAND_CURSOR);
         }
     }
 }

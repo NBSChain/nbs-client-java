@@ -5,6 +5,7 @@ import io.nbs.client.ui.components.SizeAutoAdjustTextArea;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.TitlePanel;
 
+import io.nbs.client.ui.panels.WinResizer;
 import io.nbs.commons.helper.ConfigurationHelper;
 
 import javax.swing.*;
@@ -19,7 +20,7 @@ import java.util.Properties;
  * Copyright (c) 2018, NBS , lambor.c<lanbery@gmail.com>.
  * All rights reserved.
  */
-public class AboutMasterPanel extends JPanel {
+public class AboutMasterPanel extends JPanel implements WinResizer {
     private TitlePanel winTitlePanel;
 
     private JPanel centerPanel;
@@ -37,7 +38,7 @@ public class AboutMasterPanel extends JPanel {
     }
 
     private void initComponents(){
-        this.winTitlePanel = new TitlePanel(this);
+        this.winTitlePanel = new TitlePanel(this,this);
         winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.about.label","About NBS Chain"));
 
         centerPanel = new JPanel();
@@ -71,5 +72,11 @@ public class AboutMasterPanel extends JPanel {
 
     private void setListeners(){
 
+    }
+
+
+    @Override
+    public void resize() {
+        this.bodyPanel.setPreSize();
     }
 }

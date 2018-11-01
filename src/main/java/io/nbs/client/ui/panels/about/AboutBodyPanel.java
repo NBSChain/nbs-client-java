@@ -1,9 +1,12 @@
 package io.nbs.client.ui.panels.about;
 
+import io.nbs.client.cnsts.ColorCnst;
+import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
 import io.nbs.commons.utils.IconUtil;
 
 import javax.swing.*;
+import java.awt.*;
 
 
 /**
@@ -18,6 +21,7 @@ public class AboutBodyPanel extends ParentAvailablePanel {
     private static AboutBodyPanel context;
 
     private JLabel backgroundLabel;
+    private ScaleIcon icon;
 
     /**
      * construction
@@ -37,12 +41,11 @@ public class AboutBodyPanel extends ParentAvailablePanel {
      * @return {[type]} [description]
      */
     private void initComponents() {
-
-        ImageIcon icon = IconUtil.getIcon(context,"/icons/about_bg.png");
+        Icon iconDef = IconUtil.getIcon(context,"/icons/about_bg.png");
+        icon = new ScaleIcon(iconDef);
         backgroundLabel = new JLabel();
         backgroundLabel.setIcon(icon);
-
-
+        //this.setBorder(ColorCnst.RED_BORDER);
     }
 
     /**
@@ -66,17 +69,46 @@ public class AboutBodyPanel extends ParentAvailablePanel {
     public static AboutBodyPanel getContext() {
         return context;
     }
-/*
-    @Override
-    protected void paintComponent(Graphics g) {
 
-        g.drawImage(bgImage,this.getWidth(),this.getHeight(),null);
-        Graphics2D g2 = (Graphics2D)g;
-*//*        int width = getWidth();
-        int height = getHeight();
-        GradientPaint gradientPaint = new GradientPaint(0,0,new Color(37,32,72),width,height,new Color(59,54,98));
-        g2.setPaint(gradientPaint);
-        g2.fillRect(0,0,width,height);*//*
-    }*/
 
+    public void setPreSize(){
+        Rectangle rect = MainFrame.getContext().getBounds();
+        int cW = rect.width;
+        int cH = rect.height;
+        this.backgroundLabel.setPreferredSize(new Dimension(cW,cH));
+        this.backgroundLabel.setIcon(icon);
+        this.updateUI();
+    }
+
+
+
+
+    private class ScaleIcon implements Icon{
+        private Icon icon;
+        public ScaleIcon (Icon icon){
+            this.icon = icon;
+        }
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            float w = c.getWidth();
+            float h = c.getHeight();
+            int iconW = getIconWidth();
+            int iconH = getIconHeight();
+
+            Graphics2D g2d = (Graphics2D)g;
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.scale(w/iconW,h/iconH);
+            icon.paintIcon(c,g2d,0,0);
+        }
+
+        @Override
+        public int getIconWidth() {
+            return icon == null ? 0 : icon.getIconWidth();
+        }
+
+        @Override
+        public int getIconHeight() {
+            return icon == null ? 0 : icon.getIconHeight();
+        }
+    }
 }

@@ -8,17 +8,17 @@ import io.ipfs.multihash.Multihash;
 import io.ipfs.nbs.DownloadThreadBooster;
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
-import io.nbs.client.helper.BrowserOperationHelper;
 import io.nbs.client.ui.components.LCJlabel;
 import io.nbs.client.ui.components.NBSButton;
 import io.nbs.client.ui.components.VerticalFlowLayout;
 import io.nbs.client.ui.components.forms.LCFormLabel;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
+import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.commons.helper.DateHelper;
 import io.nbs.commons.utils.DataSizeFormatUtil;
 import net.miginfocom.swing.MigLayout;
-import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -137,7 +137,7 @@ public class TipResultHashPanel extends ParentAvailablePanel {
         operPanel.setLayout(new FlowLayout(FlowLayout.RIGHT,20,5));
         operPanel.setVisible(false);
         operPanel.add(searchUsed);
-        openBtn = new NBSButton("浏览器打开",ColorCnst.CONTACTS_ITEM_GRAY,ColorCnst.WINDOW_BACKGROUND_LIGHT);
+        openBtn = new NBSButton("打开",ColorCnst.CONTACTS_ITEM_GRAY,ColorCnst.WINDOW_BACKGROUND_LIGHT);
         openBtn.setForeground(ColorCnst.FONT_ABOUT_TITLE_BLUE);
         addBtn = new NBSButton("下载到本地",ColorCnst.CONTACTS_ITEM_GRAY,ColorCnst.WINDOW_BACKGROUND_LIGHT);
         addBtn.setVisible(true);//暂未开发完成
@@ -206,13 +206,22 @@ public class TipResultHashPanel extends ParentAvailablePanel {
         contentPanel.add(errorLabel,"split ,span 1 ,wrap,grow");
     }
 
+    //
     private void setListeners() {
         openBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 monitPanel.monitorList();
-                logger.info("客户端IP:{}打开浏览器时间:{},浏览HASH:{}",MainFrame.getContext().getCurrentPeer().getIp(),DateHelper.currentTime(),hash58);
-                BrowserOperationHelper.getInstance().openURL(hash58);
+                logger.info("TipResultHashPanel 客户端IP:{}打开浏览器时间:{},浏览HASH:{}"
+                        ,MainFrame.getContext().getCurrentPeer().getIp(),DateHelper.currentTime(),hash58);
+                if(StringUtils.isNotBlank(hash58)){
+                    String title =hash58;
+                    MediaBrowserFrame browserFrame = new MediaBrowserFrame(title,title);
+                    browserFrame.setVisible(true);
+                    //new DialogPlayer(hash58,title).setVisible(true);
+                }
+
+                //BrowserOperationHelper.getInstance().openURL(hash58);
             }
         });
 

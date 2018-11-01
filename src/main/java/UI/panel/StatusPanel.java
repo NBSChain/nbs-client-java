@@ -6,7 +6,7 @@ import UI.button.AvatarIconButton;
 
 import UI.templete.WihteBackJPanel;
 import com.alibaba.fastjson.JSON;
-import com.nbs.ipfs.IPFSHelper;
+import io.ipfs.nbs.helper.IPFSHelper;
 import com.nbs.tools.PropertyUtil;
 import com.nbs.tools.StringHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;

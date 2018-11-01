@@ -1,7 +1,7 @@
 package com.nbs.test;
 
 import com.alibaba.fastjson.JSON;
-import com.nbs.ipfs.IPFSHelper;
+import io.ipfs.nbs.helper.IPFSHelper;
 import com.nbs.ipfs.entity.IpfsMessage;
 import io.ipfs.api.JSONParser;
 

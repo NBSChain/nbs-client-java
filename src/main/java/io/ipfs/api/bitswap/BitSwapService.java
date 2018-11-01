@@ -1,10 +1,11 @@
 package io.ipfs.api.bitswap;
 
 import com.alibaba.fastjson.JSON;
+import io.ipfs.IpfsCnst;
 import io.ipfs.api.ResData;
 import io.ipfs.api.beans.bw.BitSwap;
 import io.ipfs.api.repo.RepoStat;
-import io.nbs.commons.helper.ConfigurationHelper;
+import io.nbs.client.Launcher;
 import io.nbs.commons.utils.HttpUtils;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
@@ -28,11 +29,12 @@ public class BitSwapService {
     private static final String API_VER_SUFFIX = "/api/v0/";
     private static  String HOST = "127.0.0.1";
     private static  int PORT = 5001;
-    private static final String PROTOCOL = "http";
+    private static  String PROTOCOL = "http";
 
     private BitSwapService() {
-        HOST = ConfigurationHelper.getInstance().getIPFSServerHost();
-        PORT = Integer.parseInt(ConfigurationHelper.getInstance().getIPFSApiPort());
+        HOST = Launcher.appSettings.getHost();
+        PORT = Launcher.appSettings.getApiPort();
+        PROTOCOL = Launcher.appSettings.getConfigVolme(IpfsCnst.MM_GATEWAY_PROTOCOL_KEY,PROTOCOL);
     }
 
     public static BitSwapService getInstance(){

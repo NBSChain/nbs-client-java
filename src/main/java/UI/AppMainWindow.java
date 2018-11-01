@@ -10,7 +10,7 @@ import com.nbs.biz.ImPeersService;
 import io.nbs.client.vo.ContactsItem;
 import com.nbs.entity.PeerBoradcastInfo;
 import com.nbs.entity.PeerInfoBase;
-import com.nbs.ipfs.IPFSHelper;
+import io.ipfs.nbs.helper.IPFSHelper;
 import com.nbs.ipfs.entity.IpfsMessage;
 import com.nbs.tools.PropertyUtil;
 import com.nbs.ui.frames.MainFrameOld;
@@ -115,7 +115,7 @@ public class AppMainWindow {
     public static void main(String[] args){
         String basedir = System.getProperty("app.home");
         System.out.println("nbs-client-dir>>>>>>>>>>"+basedir);
-      /*  EventQueue.invokeLater(
+        EventQueue.invokeLater(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -128,7 +128,7 @@ public class AppMainWindow {
 
                     }
                 }
-        );*/
+        );
     }
 
 

@@ -10,6 +10,7 @@ import io.ipfs.api.MerkleNode;
 import io.ipfs.api.beans.blk.BlockStat;
 import io.ipfs.multihash.Multihash;
 import io.nbs.client.Launcher;
+import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.listener.AbstractMouseListener;
@@ -132,7 +133,7 @@ public class MMSearcherPanel extends ParentAvailablePanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                buttonPanel.setCursor(MainFrame.handCursor);
+                buttonPanel.setCursor(AppGlobalCnst.HAND_CURSOR);
                 super.mouseEntered(e);
             }
 
