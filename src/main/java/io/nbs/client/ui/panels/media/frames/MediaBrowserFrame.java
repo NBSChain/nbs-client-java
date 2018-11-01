@@ -4,7 +4,6 @@ import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.OSUtil;
-import io.nbs.commons.utils.IconUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +36,7 @@ public class MediaBrowserFrame extends JFrame {
 
     private PlayerStatusPanel statusPanel;
     private Container container;
+    private JLabel text;
 
     public MediaBrowserFrame (String hash){
         this(hash,null);
@@ -53,6 +53,7 @@ public class MediaBrowserFrame extends JFrame {
         initView();
 
         //
+
 
         playerPanel.load(getUrl());
     }
@@ -122,4 +123,11 @@ public class MediaBrowserFrame extends JFrame {
     public MediaTitlePanel getTitlePanel() {
         return titlePanel;
     }
+
+    public void closePlayer(){
+        if(this.playerPanel!=null){
+            this.playerPanel.destoryEngine();
+        }
+    }
+
 }

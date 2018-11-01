@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.media.frames;
 
+import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.ui.panels.WinResizer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -36,8 +37,10 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
     private static WebView view;
 
     private BrowserThread browserThread;
+    private static MainPlayerPanel context;
 
     public MainPlayerPanel(MediaBrowserFrame browserFrame){
+        context = this;
         this.browserFrame = browserFrame;
         initComponents();
         initView();
@@ -82,6 +85,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
         public void run() {
             super.run();
             root = new Group();
+            root.setAutoSizeChildren(true);
             Scene scene = new Scene(root);
             webBrowser.setScene(scene);
             view = new WebView();
@@ -142,6 +146,18 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
         }
     }
 
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/11/1
+     * @Description  :
+     * 
+     */
+    public void destoryEngine(){
+        if(view!=null){
+            Platform.runLater(new WebEngineDestory(view.getEngine()));
+        }
+    }
+
     @Override
     public void resize() {
         Rectangle rect = getBounds();
@@ -149,8 +165,60 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
         int cH = rect.height;
         if(view!=null){
             webBrowser.setPreferredSize(new Dimension(cW,cH));
+            webBrowser.setBorder(ColorCnst.RED_BORDER);
             view.setPrefSize(new Integer(cW).doubleValue(),new Integer(cH).doubleValue());
+            Platform.runLater(new WebViewController(view,root,2));
             webBrowser.updateUI();
+        }
+    }
+
+
+    public class WebEngineDestory implements Runnable{
+        private WebEngine engine;
+        public WebEngineDestory(WebEngine webEngine){
+            this.engine = webEngine;
+        }
+        @Override
+        public void run() {
+            this.engine.load(null);
+        }
+    }
+
+    public class WebViewController implements Runnable{
+        private WebView view;
+        private Group root;
+        private int stat = 0;
+
+        public WebViewController(WebView webView,Group root,int stat){
+            this.view = webView;
+            this.root = root;
+            this.stat = stat;
+        }
+
+        @Override
+        public void run() {
+            if(view==null||root ==null)return;
+            WebEngine engine = view.getEngine();
+
+            switch (stat){
+                case 0:
+                    engine.load(null);
+                    break;
+                case 1:
+
+                    break;
+                case 2:
+                    Rectangle rect = context.getBounds();
+                    double w = rect.getWidth();
+                    double h = rect.getHeight();
+                    root.setAutoSizeChildren(true);
+                    view.resize(w,h);
+                    //engine.getOnResized();
+                    engine.reload();
+                    break;
+                default:
+                    return;
+            }
         }
     }
 }

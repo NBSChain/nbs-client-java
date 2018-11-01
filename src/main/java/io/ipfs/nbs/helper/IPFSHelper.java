@@ -103,15 +103,17 @@ public class IPFSHelper {
     public FileType getTypeFromHash(String hash) throws FileFormatUnSupportException {
         try{
             Multihash multihash = fromHash58(hash);
-            byte[] data = ipfs.object.data(multihash);
+            byte[] data = ipfs.get(multihash);
 
-//            String tem = new String(data,0,28,"utf-8");
-//            logger.info(tem);
+            String tem = new String(data,0,28,"utf-8");
+            logger.info(tem);
             return FileType.forValue(convert2String(data));
         }catch (IllegalFormatException ife){
             throw new FileFormatUnSupportException(ife.getMessage(),ife.getCause());
         }catch (IOException ioe){
             throw new FileFormatUnSupportException(ioe.getMessage(),ioe.getCause());
+        }catch (RuntimeException r){
+            throw new FileFormatUnSupportException(r.getMessage(),r.getCause());
         }
     }
 

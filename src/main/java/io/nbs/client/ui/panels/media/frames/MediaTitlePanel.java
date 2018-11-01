@@ -82,7 +82,7 @@ public class MediaTitlePanel extends JPanel {
         closeLabel.setOpaque(true);
         closeLabel.setPreferredSize(ctrlItemSize);
         closeLabel.setCursor(handCursor);
-        //closeLabel.addMouseListener(listener);
+        closeLabel.addMouseListener(listener);
 
         maxLabel = new JLabel();
         maxLabel.setIcon(maxIcon);
@@ -215,6 +215,7 @@ public class MediaTitlePanel extends JPanel {
         @Override
         public void mouseClicked(MouseEvent e) {
             if(e.getComponent()==closeLabel){
+                browserFrame.closePlayer();
                 browserFrame.dispose();
             }else if(e.getComponent() == maxLabel){
                 maxOrRestoreWindow();

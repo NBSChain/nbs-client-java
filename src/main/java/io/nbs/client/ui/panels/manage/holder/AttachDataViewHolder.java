@@ -8,15 +8,14 @@ import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.components.*;
-import io.nbs.client.ui.frames.InitialDappFrame;
-import io.nbs.client.ui.frames.LoadingFrame;
+
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.holders.ViewHolder;
 import io.nbs.client.ui.panels.manage.listener.FillDetailInfoListener;
 import io.nbs.client.ui.panels.media.MediaPlayerView;
 import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.client.vo.AttachmentDataDTO;
-import io.nbs.commons.helper.ConfigurationHelper;
+
 import io.nbs.commons.types.FileType;
 import io.nbs.commons.utils.IconUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -24,9 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
+
 import java.awt.event.*;
-import java.io.IOException;
 
 /**
  * @Package : io.nbs.client.ui.panels.manage.holder
@@ -162,53 +160,23 @@ public abstract class AttachDataViewHolder extends ViewHolder {
                     AttachmentDataDTO m = (AttachmentDataDTO)o;
                     if(StringUtils.isNotBlank(m.getId())){
                         //检测 file type
-
-                        FileType fileType;
-                        try{
-                            fileType = IPFSHelper.getInstance().getTypeFromHash(m.getId());
-                        }catch (FileFormatUnSupportException fe){
-                            fileType = null;
-                        }
+//
+//                        FileType fileType;
+//                        try{
+//                            fileType = IPFSHelper.getInstance().getTypeFromHash(m.getId());
+//                        }catch (FileFormatUnSupportException fe){
+//                            fileType = null;
+//                        }
                         //内部open
                         //MainFrame.getContext().openLoadHashMedia(m.getId());
                         String title = StringUtils.isNotBlank(m.getFname()) ? m.getFname(): m.getId();
-//                        if(dialogPlayer == null){
-//                            dialogPlayer = new DialogPlayer(m.getId(),title);
-//                            dialogPlayer.load().setVisible(true);
-//                        }else {
-//                            //dialogPlayer.stop();
-//                            dialogPlayer.load(m.getId(),title).setVisible(true);
-//                        }
 
-//                        if(mediaPlayerView==null){
-//                            mediaPlayerView = MediaPlayerView.launcher(m.getId(),title);
-//                        }else {
-//                            mediaPlayerView.stop();
-//                        }
-
-                        //
-//                        if(mediaPlayerView==null){
-//                            mediaPlayerView = MediaPlayerView.launcher(m.getId(),title);
-//                        }else {
-//                            mediaPlayerView.showFrame();
-//                        }
 
                         /* frame */
                         MediaBrowserFrame browserFrame = new MediaBrowserFrame(m.getId(),title);
                         browserFrame.setVisible(true);
 
-                        /* browser open */
-//                        String hash = m.getId();
-//                        java.net.URI uri = java.net.URI.create(urlBase+ hash);
-//                        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-//                        if(desktop.isSupported(Desktop.Action.BROWSE)){
-//                            try {
-//                                desktop.browse(uri);
-//                            } catch (IOException e1) {
-//                                e1.printStackTrace();
-//                                logger.error(e1.getMessage());
-//                            }
-//                        }
+
                     }
                 }
             }
