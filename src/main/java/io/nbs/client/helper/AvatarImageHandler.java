@@ -68,6 +68,7 @@ public class AvatarImageHandler {
         AVATAR_PROFILE_HOME = AppGlobalCnst.consturactPath(Launcher.appBasePath,"profile","avatars");
         AVATAR_ORIGIN_HOME = AppGlobalCnst.consturactPath(Launcher.appBasePath,"cache","avatars");
         AVATAR_CUSTOM_HOME = AppGlobalCnst.consturactPath(Launcher.appBasePath,"cache","avatars","custom");
+        initAvatarLocalDir();
     }
 
     /**
@@ -179,6 +180,8 @@ public class AvatarImageHandler {
             throw new Exception("获取文件错误",e.getCause());
         }
     }
+
+
 
     /**
      * 上传时

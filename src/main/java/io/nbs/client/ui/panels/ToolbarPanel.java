@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.ui.components.VerticalFlowLayout;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
@@ -19,6 +20,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.URL;
 
 /**
  * @Package : io.ipfs.nbs.ui.panels
@@ -83,8 +85,7 @@ public class ToolbarPanel extends JPanel {
         upButtonPanel.setLayout(new VerticalFlowLayout(VerticalFlowLayout.TOP,0,30,false,false));
 
         avatarLabel = new JLabel();
-        PeerInfo peer = MainFrame.getContext().getCurrentPeer();
-        ImageIcon icon = getAvatarIcon(peer);
+        ImageIcon icon = IconUtil.getIcon(this,"/icons/logo48.png");
         avatarLabel.setIcon(icon);
         avatarLabel.setHorizontalAlignment(JLabel.CENTER);
         initialButton();
@@ -109,9 +110,9 @@ public class ToolbarPanel extends JPanel {
     private ImageIcon getAvatarIcon(PeerInfo peer){
         ImageIcon icon;
         if(peer!=null&&StringUtils.isNotBlank(peer.getId())
-                &&StringUtils.isNotBlank(peer.getAvatarName())){
-            String a48Path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),peer.getAvatarName());
-            //System.out.println(a48Path);
+                &&StringUtils.isNotBlank(peer.getAvatar())){
+            String a48Path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),peer.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
+
             if((new File(a48Path)).exists()){
                 icon = new ImageIcon(a48Path);
                 Image image = icon.getImage().getScaledInstance(48,48,Image.SCALE_SMOOTH);
@@ -148,7 +149,45 @@ public class ToolbarPanel extends JPanel {
         add(bottomPanel,
                 new GBC(0,1).setWeight(1,1).setFill(GBC.VERTICAL).setInsets(0,0,2,0));
 
+        syncLoadAvatars();
+    }
 
+    public void reloadAvatar(ImageIcon icon){
+        if(icon != null){
+            avatarLabel.setIcon(icon);
+            avatarLabel.updateUI();
+        }
+    }
+
+    private void syncLoadAvatars(){
+        PeerInfo peerInfo = Launcher.currentPeer;
+        if(peerInfo!=null&&StringUtils.isNotBlank(peerInfo.getAvatar())){
+            AvatarImageHandler imageHandler = AvatarImageHandler.getInstance();
+            String path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),peerInfo.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
+            File avatarFile = new File(path);
+
+            new Thread(){
+                @Override
+                public void run() {
+                    try{
+                        boolean b =false;
+                        if(avatarFile.isFile()&&avatarFile.exists()){
+                            b =true;
+                        }else {
+                            URL url = new URL(Launcher.appSettings.getGatewayURL(peerInfo.getAvatar()));
+                            b = imageHandler.getFileFromIPFS(url,avatarFile);
+                        }
+                        if(b){
+                            Icon icon = imageHandler.getAvatarScaleIcon(avatarFile,48);
+                            avatarLabel.setIcon(icon);
+                            avatarLabel.updateUI();
+                        }
+                    }catch (Exception e){
+
+                    }
+                }
+            }.start();
+        }
     }
 
     private void setListeners(){

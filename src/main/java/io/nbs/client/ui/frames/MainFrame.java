@@ -29,6 +29,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -253,8 +254,8 @@ public class MainFrame extends JFrame {
         this.currentPeer = currentPeer;
     }
 
-    public void refreshAvatar(){
-        toolbarPanel.refreshToolbarAvatar();
+    public void refreshAvatar(ImageIcon icon){
+        toolbarPanel.reloadAvatar(icon);
     }
 
     /**

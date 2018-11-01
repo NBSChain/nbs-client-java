@@ -82,12 +82,11 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
         JPanel rightPanel = new JPanel();
 
 
-
-
         /**
          * avatar
          */
-        String avatar128Path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),self.getAvatarName());
+        String avatar128Path = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),self.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
+        logger.info("INFO avatar : {}",avatar128Path);
         ImageIcon avatar = AvatarImageHandler.getInstance().getImageIconFromOrigin(avatar128Path,200);
         avatarLabel.setIcon(avatar);
 
@@ -136,8 +135,6 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
     }
 
     private void setListeners(){
-
-
 
     }
 
