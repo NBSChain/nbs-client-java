@@ -29,27 +29,27 @@ public class MediaBrowserFrame extends JFrame {
     public int currentWindowHeight = H_SIZE;
 
     private String hash;
-    private String title;
+
 
     private MediaTitlePanel titlePanel;
+    private PlayerStatusPanel statusPanel;
     private MainPlayerPanel playerPanel;
 
-    private PlayerStatusPanel statusPanel;
     private Container container;
-    private JLabel text;
+
 
     public MediaBrowserFrame (String hash){
-        this(hash,null);
+        this(hash,hash);
     }
 
     public MediaBrowserFrame (String hash,String title){
         this.hash = hash;
-
         titlePanel = new MediaTitlePanel(this,title);
+        this.statusPanel = new PlayerStatusPanel();
+
         playerPanel = new MainPlayerPanel(this);
         titlePanel.setWinResizer(playerPanel);
         //
-        this.statusPanel = new PlayerStatusPanel();
         initComponents();
         initView();
 
@@ -70,19 +70,6 @@ public class MediaBrowserFrame extends JFrame {
         UIManager.put("Panel.background", ColorCnst.WINDOW_BACKGROUND);
         UIManager.put("CheckBox.background", ColorCnst.WINDOW_BACKGROUND);
 
-        this.statusPanel.setBackground(ColorCnst.DARK);
-        if(OSUtil.getOsType() != OSUtil.Mac_OS){
-            String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
-            setUndecorated(true);//隐藏标题栏
-            try {
-                UIManager.setLookAndFeel(windows);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }else {
-
-        }
         container = getContentPane();
     }
 
@@ -92,20 +79,26 @@ public class MediaBrowserFrame extends JFrame {
         contentPanel.setBorder(new LineBorder(ColorCnst.LIGHT_GRAY));
         contentPanel.setLayout(new BorderLayout());
 
+        this.statusPanel.setBackground(ColorCnst.DARK);
 
-        if(OSUtil.getOsType()!=OSUtil.Mac_OS){
-           // this.setIconImage(Launcher.logo.getImage());
-
-        }else {
+        if(OSUtil.getOsType() != OSUtil.Mac_OS){
+            String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+            setUndecorated(true);//隐藏标题栏
+            try {
+                UIManager.setLookAndFeel(windows);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        }else {
+
         }
+
         this.setIconImage(Launcher.logo.getImage());
         container.setLayout(new BorderLayout());
         container.add(titlePanel,BorderLayout.NORTH);
         container.add(playerPanel,BorderLayout.CENTER);
         container.add(statusPanel,BorderLayout.SOUTH);
-
-        //this.add(container,BorderLayout.CENTER);
 
         centerScreen();
     }

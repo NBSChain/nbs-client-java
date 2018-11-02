@@ -1,6 +1,5 @@
 package io.nbs.client.ui.panels.media.frames;
 
-import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.ui.panels.WinResizer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;

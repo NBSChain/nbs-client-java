@@ -159,13 +159,7 @@ public abstract class AttachDataViewHolder extends ViewHolder {
                     AttachmentDataDTO m = (AttachmentDataDTO)o;
                     if(StringUtils.isNotBlank(m.getId())){
                         //检测 file type
-//
-//                        FileType fileType;
-//                        try{
-//                            fileType = IPFSHelper.getInstance().getTypeFromHash(m.getId());
-//                        }catch (FileFormatUnSupportException fe){
-//                            fileType = null;
-//                        }
+
                         //内部open
                         //MainFrame.getContext().openLoadHashMedia(m.getId());
                         String title = StringUtils.isNotBlank(m.getFname()) ? m.getFname(): m.getId();
