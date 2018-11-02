@@ -29,6 +29,7 @@ public class MediaBrowserFrame extends JFrame {
     public int currentWindowWidth = W_SIZE;
     public int currentWindowHeight = H_SIZE;
 
+
     private String hash;
 
 
@@ -47,6 +48,8 @@ public class MediaBrowserFrame extends JFrame {
         if(Launcher.getContext().getCurrentScreenSize() == ScreenSize.Low){
             W_SIZE = 1024;
             H_SIZE = 768;
+            currentWindowWidth = W_SIZE;
+            currentWindowHeight = H_SIZE;
         }
         this.hash = hash;
         titlePanel = new MediaTitlePanel(this,title);
@@ -59,7 +62,7 @@ public class MediaBrowserFrame extends JFrame {
         initView();
 
         //
-        playerPanel.load(getUrl());
+        //playerPanel.load(getUrl());
 
     }
 
@@ -113,6 +116,12 @@ public class MediaBrowserFrame extends JFrame {
         return Launcher.appSettings.getGatewayURL(hash);
     }
 
+    public void loadUrl(){
+        if(this.playerPanel!=null){
+            //this.playerPanel.load(getUrl());
+        }
+    }
+
     /**
      * 居中设置
      */
@@ -132,7 +141,7 @@ public class MediaBrowserFrame extends JFrame {
 
     public void closePlayer(){
         if(this.playerPanel!=null){
-            this.playerPanel.destoryEngine();
+            //this.playerPanel.destoryEngine();
         }
     }
 

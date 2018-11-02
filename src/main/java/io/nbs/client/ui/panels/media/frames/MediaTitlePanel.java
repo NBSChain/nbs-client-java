@@ -129,11 +129,11 @@ public class MediaTitlePanel extends JPanel {
             left.add(titlePanel);
             add(left,
                     new GBC(0,0).setFill(GBC.BOTH).setWeight(85,5).setInsets(0,0,0,0));
-            margin = 15;
+            margin = 10;
         }
 
         titlePanel.add(titleLabel,
-                new GBC(0,0).setFill(GBC.BOTH).setWeight(300,1).setInsets(margin,margin,0,0));
+                new GBC(0,0).setFill(GBC.BOTH).setWeight(300,1).setInsets(0,margin,0,0));
     }
 
     public void setWinResizer(WinResizer winResizer) {

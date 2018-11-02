@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.media.frames;
 
+import io.nbs.client.ui.components.DialogPlayer;
 import io.nbs.client.ui.panels.WinResizer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -32,11 +33,10 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
     private MediaBrowserFrame browserFrame;
 
     private final JFXPanel webBrowser = new JFXPanel();
-    private static Group root;
-    private static WebView view;
-    private static WebEngine engine;
+    private  Group root;
+    private  WebView view;
+    private  WebEngine engine;
 
-    private BrowserThread browserThread;
     private static MainPlayerPanel context;
 
     public MainPlayerPanel(MediaBrowserFrame browserFrame){
@@ -54,163 +54,56 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
         setBorder(null);
         this.setLayout(new BorderLayout());
         this.add(webBrowser,BorderLayout.CENTER);
-    }
 
-    public void load(String url){
-        Rectangle rect = browserFrame.getBounds();
-        double w = rect.getWidth();
-        int tbH =  browserFrame.getStatusPanel().getHeight();
-        logger.info("TB>{}",tbH);
-        double h = rect.getHeight() - new Integer(MediaBrowserFrame.TH_SIZE).doubleValue()-new Integer(tbH).doubleValue();
-        logger.info("browser w-h :{} * {}",w,h);
-        browserThread = new BrowserThread(url,w,h);
-        Platform.runLater(browserThread);
-    }
+        double dW = new Integer(browserFrame.currentWindowWidth).doubleValue();
+        double dH = new Integer(browserFrame.currentWindowHeight-MediaBrowserFrame.TH_SIZE-PlayerStatusPanel.status_H).doubleValue();
 
-
-    private class BrowserThread extends Thread{
-        private String url;
-        private double width;
-        private double height;
-        public BrowserThread(String url,double w,double h){
-            this.url = url;
-            this.width = w;
-            this.height = h;
-        }
-        private CloseMouseAdapter adapter;
-
-        @Override
-        public void run() {
-            root = new Group();
-            root.setAutoSizeChildren(true);
-            Scene scene = new Scene(root,width,height);
-            webBrowser.setScene(scene);
-            view = new WebView();
-            view.setMinSize(width,height);
-            view.setPrefSize(width,height);
-            engine = view.getEngine();
-            JLabel closeLabel = browserFrame.getTitlePanel().getCloseLabel();
-            adapter = new CloseMouseAdapter(engine);
-            closeLabel.addMouseListener(adapter);
-            engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-                @Override
-                public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
-                    logger.info("loading:{}",newValue.name() );
-                    adapter.setComplated(true);
-                    if(newValue == Worker.State.SUCCEEDED || newValue == Worker.State.FAILED){
-                        browserFrame.getStatusPanel().setState(newValue.name());
-                        webBrowser.updateUI();
-                    }
-                }
-            });
-
-            //engine.load(this.url);
-            root.getChildren().add(view);
-        }
-    }
-
-    private class CloseMouseAdapter extends MouseAdapter{
-        private boolean complated = false;
-        private WebEngine webEngine;
-
-        public CloseMouseAdapter(WebEngine webEngine){
-            this.webEngine = webEngine;
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if(complated&&webEngine!=null){
-                logger.info("closed browser....");
-                try{
-                    String scripts = "var myVideo = document.getElementsByTagName(\"video\")[0]; " +
-                            "if(myVideo)myVideo.pause();";
-                    webEngine.executeScript(scripts);
-                    Platform.setImplicitExit(true);
-                }catch (RuntimeException re){
-                    logger.warn(re.getMessage(),re.getCause());
-                }
-            }
-            browserFrame.dispose();
-        }
-
-        public boolean isComplated() {
-            return complated;
-        }
-
-        public void setComplated(boolean complated) {
-            logger.info("setTrue");
-            this.complated = complated;
-        }
-    }
-
-    /**
-     * @author      : lanbery
-     * @Datetime    : 2018/11/1
-     * @Description  :
-     * 
-     */
-    public void destoryEngine(){
-        if(view!=null){
-            Platform.runLater(new WebViewController(view,root,0));
-        }
+        Platform.runLater(new MediaRunable(browserFrame.getUrl(),dW,dH));
+        webBrowser.updateUI();
     }
 
     @Override
     public void resize() {
 
-        int cW = browserFrame.currentWindowWidth;
-        int cH = browserFrame.currentWindowHeight - MediaBrowserFrame.TH_SIZE - PlayerStatusPanel.status_H;
-        if(view!=null){
-            view.setPrefSize(new Integer(cW).doubleValue(),new Integer(cH).doubleValue());
-        }
     }
 
+    public class MediaRunable implements Runnable{
+        private String url;
+        private double width;
+        private double height;
 
-    public class WebEngineDestory implements Runnable{
-        private WebEngine engine;
-        public WebEngineDestory(WebEngine webEngine){
-            this.engine = webEngine;
-        }
-        @Override
-        public void run() {
-            this.engine.load(null);
-        }
-    }
-
-    public class WebViewController implements Runnable{
-        private WebView view;
-        private Group root;
-        private int stat = 0;
-
-        public WebViewController(WebView webView,Group root,int stat){
-            this.view = webView;
-            this.root = root;
-            this.stat = stat;
+        public MediaRunable(String url,double w,double h){
+            this.url = url;
+            this.width = w;
+            this.height = h;
         }
 
         @Override
         public void run() {
-            if(view==null||root ==null)return;
-            WebEngine engine = view.getEngine();
 
-            switch (stat){
-                case 0:
-                    engine.load(null);
-                    break;
-                case 1:
-                    //engine.load(url);
-                    break;
-                case 2:
-                    Rectangle rect = context.getBounds();
-                    double w = rect.getWidth();
-                    double h = rect.getHeight();
-                    logger.info("resize===>>{}*{}",w,h);
-                    root.setAutoSizeChildren(true);
-                    view.setPrefSize(w,h);
-                    break;
-                default:
-                    return;
-            }
+            root = new Group();
+            Scene scene = new Scene(root,this.width,this.height);
+            webBrowser.setScene(scene);
+            view = new WebView();
+            view.setPrefSize(width,height);
+            view.setMinSize(width,height);
+            engine = view.getEngine();
+            engine.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+                @Override
+                public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
+                    logger.info("{} loading...{}",url,oldValue.name());
+                    if(oldValue == Worker.State.RUNNING){
+
+                    }
+                    if(newValue == Worker.State.SUCCEEDED || newValue == Worker.State.FAILED){
+                        PlayerStatusPanel statusPanel = browserFrame.getStatusPanel();
+                        if(statusPanel!=null)statusPanel.setState(newValue.name());
+                    }
+                    logger.info("loaded State {}",newValue.name());
+                }
+            });
+            engine.load(url);
+            root.getChildren().add(view);
         }
     }
 }

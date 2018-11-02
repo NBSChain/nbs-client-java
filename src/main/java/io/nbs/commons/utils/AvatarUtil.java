@@ -174,7 +174,7 @@ public class AvatarUtil {
                         try {
                             File temCacheFile = new File(AppGlobalCnst.consturactPath(AVATAR_CACHE_ROOT,identify+suffix));
                             logger.info("avatar download:{}",identify);
-                            url = new URL(ConfigurationHelper.getInstance().getGateWayURL()+identify);
+                            url = new URL(Launcher.appSettings.getGatewayURL(identify));
                             AvatarImageHandler.getInstance().getFileFromIPFS(url,temCacheFile);
                             Image nAvatar = ImageIO.read(url);
                             avatarCache.put(identify,nAvatar);

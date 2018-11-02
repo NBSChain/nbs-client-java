@@ -164,10 +164,8 @@ public abstract class AttachDataViewHolder extends ViewHolder {
                         //MainFrame.getContext().openLoadHashMedia(m.getId());
                         String title = StringUtils.isNotBlank(m.getFname()) ? m.getFname(): m.getId();
 
-
                         /* frame */
                         MediaBrowserFrame browserFrame = new MediaBrowserFrame(m.getId(),title);
-
                         browserFrame.setVisible(true);
 
 
