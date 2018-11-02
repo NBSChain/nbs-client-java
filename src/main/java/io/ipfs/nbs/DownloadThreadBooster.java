@@ -1,7 +1,6 @@
 package io.ipfs.nbs;
 
 import com.nbs.entity.IPFSFileEntity;
-import com.sun.xml.internal.bind.v2.util.ByteArrayOutputStreamEx;
 import io.ipfs.api.IPFS;
 import io.ipfs.multihash.Multihash;
 import io.nbs.client.Launcher;
