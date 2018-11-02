@@ -57,6 +57,7 @@ public class LoadingFrame extends JFrame {
                 e.printStackTrace();
             }
         }else {
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
         JPanel contentPanel = new JPanel();
         contentPanel.setBorder(new LineBorder(ColorCnst.LIGHT_GRAY));

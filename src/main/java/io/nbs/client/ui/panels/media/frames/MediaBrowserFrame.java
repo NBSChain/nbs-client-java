@@ -4,6 +4,7 @@ import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.OSUtil;
+import io.nbs.client.ui.ScreenSize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +23,8 @@ import java.awt.*;
  */
 public class MediaBrowserFrame extends JFrame {
     private final Logger logger = LoggerFactory.getLogger(MediaBrowserFrame.class);
-    public static final int W_SIZE = 1280;
-    public static final int H_SIZE = 960;
+    public static int W_SIZE = 1280;
+    public static int H_SIZE = 960;
     public static final int TH_SIZE = 30;
     public int currentWindowWidth = W_SIZE;
     public int currentWindowHeight = H_SIZE;
@@ -43,6 +44,10 @@ public class MediaBrowserFrame extends JFrame {
     }
 
     public MediaBrowserFrame (String hash,String title){
+        if(Launcher.getContext().getCurrentScreenSize() == ScreenSize.Low){
+            W_SIZE = 1024;
+            H_SIZE = 768;
+        }
         this.hash = hash;
         titlePanel = new MediaTitlePanel(this,title);
         this.statusPanel = new PlayerStatusPanel();
@@ -60,6 +65,7 @@ public class MediaBrowserFrame extends JFrame {
 
     private void initComponents(){
         Dimension winSize = new Dimension(W_SIZE,H_SIZE);
+        logger.info("Frame Size {} * {}",W_SIZE,H_SIZE);
         setMinimumSize(winSize);
         setMaximumSize(winSize);
 

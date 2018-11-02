@@ -9,6 +9,7 @@ import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.exceptions.AppInitializedException;
+import io.nbs.client.ui.ScreenSize;
 import io.nbs.client.ui.frames.*;
 import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.commons.helper.RadomCharactersHelper;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -90,6 +92,9 @@ public class Launcher {
     public static PeerInfo currentPeer;
     private LoadingFrame loadingFrame;
 
+    private Dimension screenDimension;
+    private ScreenSize currentScreenSize;
+
     static {
         sqlSession = DataBaseUtil.getSqlSession();
         CURRENT_DIR = System.getProperty("user.dir");
@@ -111,9 +116,12 @@ public class Launcher {
 
 
     public void launch(){
+        screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
+        this.currentScreenSize = ScreenSize.convertSize(screenDimension.width,screenDimension.height);
         loadingFrame = new LoadingFrame(settingsIcon);
         loadingFrame.setVisible(true);
         loadingFrame.setIconImage(logo.getImage());
+
         /**
          * 1.初始化目录
          */
@@ -535,5 +543,12 @@ public class Launcher {
     }
 
 
+    public ScreenSize getCurrentScreenSize() {
+        return currentScreenSize;
+    }
 
+    public Dimension getScreenDimension() {
+        return screenDimension;
+    }
+    
 }

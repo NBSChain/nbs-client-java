@@ -66,6 +66,7 @@ public class InitialDappFrame extends JFrame {
         toolkit = Toolkit.getDefaultToolkit();
         initComponents(msg);
         initView();
+        this.setIconImage(Launcher.logo.getImage());
         setListeners();
         centerScreen();
     }
