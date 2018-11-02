@@ -66,8 +66,6 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
         logger.info("browser w-h :{} * {}",w,h);
         browserThread = new BrowserThread(url,w,h);
         Platform.runLater(browserThread);
-        webBrowser.updateUI();
-        this.updateUI();
     }
 
 
@@ -84,7 +82,6 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
 
         @Override
         public void run() {
-            super.run();
             root = new Group();
             root.setAutoSizeChildren(true);
             Scene scene = new Scene(root,width,height);
@@ -92,7 +89,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
             view = new WebView();
             view.setMinSize(width,height);
             view.setPrefSize(width,height);
-            WebEngine engine = view.getEngine();
+            engine = view.getEngine();
             JLabel closeLabel = browserFrame.getTitlePanel().getCloseLabel();
             adapter = new CloseMouseAdapter(engine);
             closeLabel.addMouseListener(adapter);
@@ -108,7 +105,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                 }
             });
 
-            engine.load(url);
+            //engine.load(this.url);
             root.getChildren().add(view);
         }
     }
@@ -155,7 +152,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
      */
     public void destoryEngine(){
         if(view!=null){
-            Platform.runLater(new WebEngineDestory(view.getEngine()));
+            Platform.runLater(new WebViewController(view,root,0));
         }
     }
 
@@ -163,13 +160,9 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
     public void resize() {
 
         int cW = browserFrame.currentWindowWidth;
-        int cH = browserFrame.currentWindowHeight - MediaBrowserFrame.TH_SIZE - PlayerStatusPanel.status_H-6;
+        int cH = browserFrame.currentWindowHeight - MediaBrowserFrame.TH_SIZE - PlayerStatusPanel.status_H;
         if(view!=null){
-            //webBrowser.setPreferredSize(new Dimension(cW,cH));
-            //webBrowser.setBorder(ColorCnst.RED_BORDER);
             view.setPrefSize(new Integer(cW).doubleValue(),new Integer(cH).doubleValue());
-           // Platform.runLater(new WebViewController(view,root,2));
-           // webBrowser.updateUI();
         }
     }
 
@@ -206,7 +199,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                     engine.load(null);
                     break;
                 case 1:
-
+                    //engine.load(url);
                     break;
                 case 2:
                     Rectangle rect = context.getBounds();
@@ -215,8 +208,6 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                     logger.info("resize===>>{}*{}",w,h);
                     root.setAutoSizeChildren(true);
                     view.setPrefSize(w,h);
-                    //engine.getOnResized();
-                    //engine.reload();
                     break;
                 default:
                     return;

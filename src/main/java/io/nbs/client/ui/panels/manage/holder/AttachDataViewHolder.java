@@ -1,8 +1,6 @@
 package io.nbs.client.ui.panels.manage.holder;
 
 import com.alibaba.fastjson.JSON;
-import io.ipfs.api.exceptions.FileFormatUnSupportException;
-import io.ipfs.nbs.helper.IPFSHelper;
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
@@ -16,7 +14,6 @@ import io.nbs.client.ui.panels.media.MediaPlayerView;
 import io.nbs.client.ui.panels.media.frames.MediaBrowserFrame;
 import io.nbs.client.vo.AttachmentDataDTO;
 
-import io.nbs.commons.types.FileType;
 import io.nbs.commons.utils.IconUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -56,6 +53,8 @@ public abstract class AttachDataViewHolder extends ViewHolder {
     private DialogPlayer dialogPlayer;
 
     private MediaPlayerView mediaPlayerView;
+
+//    private MediaBrowserFrame browserFrame;
 
     public AttachDataViewHolder() {
         initComponents();
@@ -174,6 +173,7 @@ public abstract class AttachDataViewHolder extends ViewHolder {
 
                         /* frame */
                         MediaBrowserFrame browserFrame = new MediaBrowserFrame(m.getId(),title);
+
                         browserFrame.setVisible(true);
 
 

@@ -48,14 +48,14 @@ public class MediaBrowserFrame extends JFrame {
         titlePanel = new MediaTitlePanel(this,title);
         playerPanel = new MainPlayerPanel(this);
         titlePanel.setWinResizer(playerPanel);
+        //
         this.statusPanel = new PlayerStatusPanel();
         initComponents();
         initView();
 
         //
-
-
         playerPanel.load(getUrl());
+
     }
 
     private void initComponents(){
@@ -79,6 +79,9 @@ public class MediaBrowserFrame extends JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+        }else {
+
         }
         container = getContentPane();
     }
@@ -91,15 +94,19 @@ public class MediaBrowserFrame extends JFrame {
 
 
         if(OSUtil.getOsType()!=OSUtil.Mac_OS){
-            this.setIconImage(Launcher.logo.getImage());
+           // this.setIconImage(Launcher.logo.getImage());
+
+        }else {
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
+        this.setIconImage(Launcher.logo.getImage());
         container.setLayout(new BorderLayout());
         container.add(titlePanel,BorderLayout.NORTH);
         container.add(playerPanel,BorderLayout.CENTER);
         container.add(statusPanel,BorderLayout.SOUTH);
 
         //this.add(container,BorderLayout.CENTER);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         centerScreen();
     }
 

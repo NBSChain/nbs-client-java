@@ -156,8 +156,9 @@ public class Launcher {
         currentFrame.setBackground(ColorCnst.WINDOW_BACKGROUND);
         currentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         if(OSUtil.getOsType()!=OSUtil.Mac_OS){
-            currentFrame.setIconImage(logo.getImage());
+            //currentFrame.setIconImage(logo.getImage());
         }
+        currentFrame.setIconImage(logo.getImage());
         currentFrame.setVisible(true);
     }
 
