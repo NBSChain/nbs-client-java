@@ -233,7 +233,7 @@ public class MessageAdapter extends BaseAdapter<BaseMessageViewHolder> {
             ImageIcon icon = new ImageIcon();
             Image image = null;
             if(item.getMessageType()<0){
-                PeerInfo currentPeer = MainFrame.getContext().getCurrentPeer();
+                PeerInfo currentPeer = Launcher.getContext().getCurrentPeer();
                 try {
                     image =  AvatarUtil.getPeerAvatar(currentPeer);
                     AvatarUtil.updateCacheIamge(currentPeer.getAvatar(),image);

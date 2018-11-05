@@ -206,7 +206,7 @@ public class AvatarUtil {
             return null;
         }
         if(avatarCache.containsKey(info.getAvatar()))return avatarCache.get(info.getAvatar());
-        File infoFile = new File(AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),info.getAvatarName()));
+        File infoFile = new File(AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),info.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX));
         if(infoFile.exists()&&infoFile.isFile()){
             BufferedImage bimage = ImageIO.read(infoFile);
             avatarCache.put(info.getAvatar(),bimage);
