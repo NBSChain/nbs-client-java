@@ -115,12 +115,15 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                                 });
                             }
                         }else {
+                            logger.info("add closed Mac listener ...{}",oldValue.name());
                             browserFrame.addWindowListener(new WindowAdapter() {
                                 @Override
-                                public void windowClosed(WindowEvent e) {
-                                    super.windowClosed(e);
+                                public void windowClosing(WindowEvent e) {
+                                    super.windowClosing(e);
                                     Platform.runLater(new CloseRunable(engine,0));
+                                    logger.info("closed Mac Window ...{}",oldValue.name());
                                 }
+
                             });
                         }
 
