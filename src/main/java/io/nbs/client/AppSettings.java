@@ -117,6 +117,7 @@ public class AppSettings {
         InputStream is = null;
         try{
             String file = System.getProperty("user.dir") + PROPS_FILE_PATH;
+            System.out.println(file);
             is = new BufferedInputStream(new FileInputStream(file));
             reader = new InputStreamReader(is,"utf-8");
             props.load(reader);

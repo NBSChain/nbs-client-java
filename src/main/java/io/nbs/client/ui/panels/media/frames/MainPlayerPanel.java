@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.media.frames;
 
+import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.ui.components.DialogPlayer;
 import io.nbs.client.ui.panels.WinResizer;
 import javafx.application.Platform;
@@ -18,6 +19,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Copyright © 2015-2020 NBSChain Holdings Limited.
@@ -100,16 +103,27 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                     logger.info("{} loading...{}",url,oldValue.name());
                     if(oldValue == Worker.State.READY){
                         logger.info("add closed listener ...{}",oldValue.name());
-                        JLabel closeLabel = browserFrame.getTitlePanel().getCloseLabel();
-                        if(closeLabel!=null){
-                            closeLabel.addMouseListener(new MouseAdapter() {
+                        if(OSUtil.getOsType() != OSUtil.Mac_OS){
+                            JLabel closeLabel = browserFrame.getTitlePanel().getCloseLabel();
+                            if(closeLabel!=null){
+                                closeLabel.addMouseListener(new MouseAdapter() {
+                                    @Override
+                                    public void mouseClicked(MouseEvent e) {
+                                        super.mouseClicked(e);
+                                        Platform.runLater(new CloseRunable(engine,0));
+                                    }
+                                });
+                            }
+                        }else {
+                            browserFrame.addWindowListener(new WindowAdapter() {
                                 @Override
-                                public void mouseClicked(MouseEvent e) {
-                                    super.mouseClicked(e);
+                                public void windowClosed(WindowEvent e) {
+                                    super.windowClosed(e);
                                     Platform.runLater(new CloseRunable(engine,0));
                                 }
                             });
                         }
+
                     }
                     if(oldValue == Worker.State.RUNNING){
 
