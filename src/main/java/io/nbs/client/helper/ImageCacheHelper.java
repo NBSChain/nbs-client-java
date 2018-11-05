@@ -2,7 +2,6 @@ package io.nbs.client.helper;
 
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
-import io.nbs.commons.helper.ConfigurationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +112,7 @@ public class ImageCacheHelper {
                 ImageIcon icon = new ImageIcon(cacheFile.getAbsolutePath());
                 listener.onSuccess(icon,cacheFile.getAbsolutePath());
             }else {
-                String IPFS_HTTP_URL = ConfigurationHelper.getInstance().getGateWayURL();
+                String IPFS_HTTP_URL = Launcher.appSettings.getBaseGatewayUrl();
                 URL url = null;
                 File originFile = new File(AppGlobalCnst.consturactPath(IMAGE_CACHE_ROOT_PATH,identify+suffix));
                 try {

@@ -1,11 +1,10 @@
 package io.nbs.client.ui.panels.about;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
-import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
-import io.nbs.commons.helper.ConfigurationHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +33,7 @@ public class AboutFooterPanel extends ParentAvailablePanel {
      */
     public AboutFooterPanel(JPanel parent) {
         super(parent);
-        sitUrl = ConfigurationHelper.getInstance().getCfgProps().getProperty("nbs.site.home.url","http://nbsio.net/");
+        sitUrl = Launcher.appSettings.getConfigVolme("nbs.site.home.url","http://nbsio.net/");
         initComponents();
         initView();
         setListeners();

@@ -12,7 +12,6 @@ import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.im.IMPeersPanel;
 import io.nbs.client.vo.ContactsItem;
 
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.commons.utils.DataBaseUtil;
 import io.nbs.commons.utils.UUIDGenerator;
 import io.nbs.sdk.beans.MessageItem;
@@ -67,7 +66,7 @@ public class ReceiverMessageAdapter implements IPFSSubscribeListener {
             /**
              * AutoReplay enabled
              */
-           if(ConfigurationHelper.getInstance().getCfgProps().getProperty("nbs.client.im.replay-open","false").equals("true")){
+           if(Launcher.appSettings.getConfigVolme("nbs.client.im.replay-open","false").equals("true")){
                autoRepaly(item.getSenderUsername());
            }
            //

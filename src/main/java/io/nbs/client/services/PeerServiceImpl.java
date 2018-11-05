@@ -7,8 +7,6 @@ import io.nbs.client.vo.ContactsItem;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.JSONParser;
 import io.nbs.client.Launcher;
-import io.nbs.commons.helper.ConfigurationHelper;
-import io.nbs.commons.helper.RadomCharactersHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +124,7 @@ public class PeerServiceImpl {
         List<String> result = null;
         try {
             Object o = null;
-            if(ConfigurationHelper.getInstance().subWorldPeers()){
+            if(Launcher.appSettings.subWorldPeers()){
                 o = ipfs.pubsub.peers(IpfsMessageSender.NBSWORLD_IMS_TOPIC);
             }else {
                 o = ipfs.pubsub.peers();

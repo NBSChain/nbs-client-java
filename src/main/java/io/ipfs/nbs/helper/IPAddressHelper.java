@@ -3,7 +3,6 @@ package io.ipfs.nbs.helper;
 import com.alibaba.fastjson.JSON;
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.commons.utils.HttpUtils;
 import io.nbs.sdk.beans.TaobaoResult;
 import okhttp3.Response;
@@ -44,10 +43,10 @@ public class IPAddressHelper {
         File dirFile = new File(HTML_TEMP);
         if(dirFile.exists())dirFile.delete();
         dirFile.mkdirs();
-        CHECKED_URL = ConfigurationHelper.getInstance()
-                .getCfgProps().getProperty("nbs.server.ip.checked-url","http://www.net.cn/static/customercare/yourip.asp");
-        CHECKED_LOCATION_URL = ConfigurationHelper.getInstance()
-                .getCfgProps().getProperty("nbs.server.ip.checked-locations-url","http://ip.taobao.com/service/getIpInfo.php?ip=");
+        CHECKED_URL =
+                Launcher.appSettings.getConfigVolme("nbs.server.ip.checked-url","http://www.net.cn/static/customercare/yourip.asp");
+        CHECKED_LOCATION_URL =
+                Launcher.appSettings.getConfigVolme("nbs.server.ip.checked-locations-url","http://ip.taobao.com/service/getIpInfo.php?ip=");
     }
 
     public static IPAddressHelper getInstance(){

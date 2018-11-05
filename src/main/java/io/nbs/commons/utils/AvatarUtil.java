@@ -5,18 +5,14 @@ import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.helper.AvatarImageHandler;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.sdk.beans.PeerInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

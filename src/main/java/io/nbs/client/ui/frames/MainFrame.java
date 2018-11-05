@@ -8,10 +8,10 @@ import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.services.IpfsMessageSender;
 import io.nbs.client.services.MessageSendService;
-import io.nbs.client.ui.panels.info.InfoFooterPanel;
+
 import io.nbs.client.ui.panels.manage.ManageMasterPanel;
 import io.nbs.client.ui.panels.media.MediaMasterPanel;
-import io.nbs.commons.helper.ConfigurationHelper;
+
 import io.nbs.sdk.beans.OnlineMessage;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.panels.MainContentPanel;
@@ -23,13 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.print.DocFlavor;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -267,7 +265,8 @@ public class MainFrame extends JFrame {
 
         //IP 解析
         //nbs.client.heart.monitor.seconds
-        final int seconds = ConfigurationHelper.getInstance().getHeartMonitorSleep();
+        String msecStr = Launcher.appSettings.getConfigVolme("nbs.client.heart.monitor.seconds","300");
+        final int seconds = Integer.parseInt(msecStr);
         new Thread(()->{
             while (heartMonitor){
                 OnlineMessage message = convertByPeerInfo(info);

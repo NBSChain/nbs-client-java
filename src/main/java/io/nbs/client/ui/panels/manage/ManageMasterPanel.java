@@ -1,7 +1,7 @@
 package io.nbs.client.ui.panels.manage;
+import io.nbs.client.Launcher;
 import io.nbs.client.ui.panels.TitlePanel;
 import io.nbs.client.ui.panels.WinResizer;
-import io.nbs.commons.helper.ConfigurationHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ public class ManageMasterPanel extends JPanel implements WinResizer {
 
     private void initComponents(){
         winTitlePanel = new TitlePanel(this,this);
-        winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.data.label","Data Manager"));
+        winTitlePanel.setTitle(Launcher.appSettings.getConfigVolme("nbs.ui.panel.data.label","Data Manager"));
         centerPanel = new JPanel();
         headerPanel = new MMHeaderPanel(this);
         bodyPanel = new MMBodyPanel(this);

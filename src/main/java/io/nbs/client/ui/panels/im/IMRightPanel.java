@@ -1,8 +1,8 @@
 package io.nbs.client.ui.panels.im;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.ui.panels.WinResizer;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
 import io.nbs.client.ui.panels.TitlePanel;
 
@@ -43,7 +43,7 @@ public class IMRightPanel extends ParentAvailablePanel implements WinResizer {
 
     private void initComponents(){
         winTitlePanel = new TitlePanel(this,this);
-        winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.im.label","NBS World IM"));
+        winTitlePanel.setTitle(Launcher.appSettings.getConfigVolme("nbs.ui.panel.im.label","NBS World IM"));
         cardLayout = new CardLayout();
         contentPanel = new JPanel();
         contentPanel.setLayout(cardLayout);

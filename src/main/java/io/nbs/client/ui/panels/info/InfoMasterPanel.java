@@ -1,8 +1,8 @@
 package io.nbs.client.ui.panels.info;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.ui.panels.WinResizer;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.client.ui.panels.TitlePanel;
 
 import javax.swing.*;
@@ -37,7 +37,7 @@ public class InfoMasterPanel extends JPanel implements WinResizer {
      */
     private void initComponents(){
         this.winTitlePanel = new TitlePanel(this,this);
-        winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.info.label","PEER INFO"));
+        winTitlePanel.setTitle(Launcher.appSettings.getConfigVolme("nbs.ui.panel.info.label","PEER INFO"));
         winTitlePanel.setBackground(ColorCnst.LIGHT_GRAY);
         /**
          *

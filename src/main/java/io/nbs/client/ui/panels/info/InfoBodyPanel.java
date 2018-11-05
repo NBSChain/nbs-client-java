@@ -1,5 +1,6 @@
 package io.nbs.client.ui.panels.info;
 
+import io.ipfs.IpfsCnst;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
@@ -14,21 +15,20 @@ import io.nbs.client.ui.components.LCJlabel;
 import io.nbs.client.ui.components.VerticalFlowLayout;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
-import io.nbs.commons.helper.ConfigurationHelper;
+
 import io.nbs.commons.utils.IconUtil;
 import io.nbs.sdk.beans.PeerInfo;
+import io.nbs.sdk.constants.ConfigKeys;
 import io.nbs.sdk.prot.IPMParser;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.imageio.ImageIO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -199,7 +199,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
                 if(ipfs==null)return;
                 try {
                     String enUpText = IPMParser.urlEncode(upText);
-                    ipfs.config.set(ConfigurationHelper.JSON_NICKNAME_KEY,enUpText);
+                    ipfs.config.set(ConfigKeys.nickname.key(),enUpText);
                     MainFrame.getContext().getCurrentPeer().setNick(upText);
                     nickLabel.setText(upText);
                 } catch (IOException ioe) {
@@ -247,9 +247,9 @@ public class InfoBodyPanel extends ParentAvailablePanel {
                 self.setAvatarName(originAvatarName);
                 self.setAvatarSuffix(name.substring(name.lastIndexOf(".")));
 
-                ipfs.config.set(ConfigurationHelper.JSON_AVATAR_KEY,fileHash);
-                ipfs.config.set(ConfigurationHelper.JSON_AVATAR_SUFFIX_KEY,self.getAvatarSuffix());
-                ipfs.config.set(ConfigurationHelper.JSON_AVATAR_NAME_KEY,originAvatarName);
+                ipfs.config.set(ConfigKeys.avatarHash.key(),fileHash);
+                ipfs.config.set(ConfigKeys.avatarSuffix.key(),self.getAvatarSuffix());
+                ipfs.config.set(ConfigKeys.avatarName.key(),originAvatarName);
 
                 //TODO 存数据库upload
                 /**

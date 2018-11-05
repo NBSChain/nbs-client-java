@@ -1,9 +1,9 @@
 package UI.panel.about;
 
 import UI.ConstantsUI;
+import io.nbs.client.Launcher;
 import io.nbs.client.ui.components.NBSIconButton;
 import com.nbs.tools.PropertyUtil;
-import io.nbs.commons.helper.ConfigurationHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +203,7 @@ public class AboutPanel extends JPanel {
                 try {
                     java.net.URI uri = java.net.URI.create(site);
                     java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-                    String v =ConfigurationHelper.getInstance().getIPFSAddress();
+                    String v = Launcher.appSettings.getConfigVolme("nbs.ui.panel.about.label.ver-value","v2.3.0");
                     logger.info(v);
                     if(desktop.isSupported(Desktop.Action.BROWSE)){
                             desktop.browse(uri);

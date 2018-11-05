@@ -1,12 +1,12 @@
 package io.nbs.client.ui.panels.about;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.ui.components.SizeAutoAdjustTextArea;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.TitlePanel;
 
 import io.nbs.client.ui.panels.WinResizer;
-import io.nbs.commons.helper.ConfigurationHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,11 +27,9 @@ public class AboutMasterPanel extends JPanel implements WinResizer {
     private AboutHeaderPanel headerPanel;
     private AboutBodyPanel bodyPanel;
     private AboutFooterPanel footerPanel;
-    protected static Properties cfgProps;
-
 
     public AboutMasterPanel() {
-        this.cfgProps = ConfigurationHelper.getInstance().getCfgProps();
+
         initComponents();
         initView();
         setListeners();
@@ -39,7 +37,7 @@ public class AboutMasterPanel extends JPanel implements WinResizer {
 
     private void initComponents(){
         this.winTitlePanel = new TitlePanel(this,this);
-        winTitlePanel.setTitle(ConfigurationHelper.getInstance().getI18nProperty("nbs.ui.panel.about.label","About NBS Chain"));
+        winTitlePanel.setTitle(Launcher.appSettings.getConfigVolme("nbs.ui.panel.about.label","About NBS Chain"));
 
         centerPanel = new JPanel();
         headerPanel = new AboutHeaderPanel(this);
