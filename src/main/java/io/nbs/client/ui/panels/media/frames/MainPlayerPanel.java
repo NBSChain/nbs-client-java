@@ -67,6 +67,12 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
 
     }
 
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/11/5
+     * @Description  :
+     *
+     */
     public class MediaRunable implements Runnable{
         private String url;
         private double width;
@@ -92,18 +98,63 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                 @Override
                 public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
                     logger.info("{} loading...{}",url,oldValue.name());
+                    if(oldValue == Worker.State.READY){
+                        logger.info("add closed listener ...{}",oldValue.name());
+                        JLabel closeLabel = browserFrame.getTitlePanel().getCloseLabel();
+                        if(closeLabel!=null){
+                            closeLabel.addMouseListener(new MouseAdapter() {
+                                @Override
+                                public void mouseClicked(MouseEvent e) {
+                                    super.mouseClicked(e);
+                                    Platform.runLater(new CloseRunable(engine,0));
+                                }
+                            });
+                        }
+                    }
                     if(oldValue == Worker.State.RUNNING){
 
                     }
                     if(newValue == Worker.State.SUCCEEDED || newValue == Worker.State.FAILED){
                         PlayerStatusPanel statusPanel = browserFrame.getStatusPanel();
                         if(statusPanel!=null)statusPanel.setState(newValue.name());
+
                     }
                     logger.info("loaded State {}",newValue.name());
                 }
             });
             engine.load(url);
             root.getChildren().add(view);
+        }
+    }
+
+    public class CloseRunable implements Runnable {
+        private WebEngine engine;
+        private int state = 0;
+        public CloseRunable(WebEngine webEngine,int stat){
+            this.engine = webEngine;
+            this.state = stat;
+        }
+
+        public CloseRunable(WebEngine webEngine){
+            this.engine = webEngine;
+        }
+
+        @Override
+        public void run() {
+            if(engine == null)return;
+            logger.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>closed .......... engine...");
+            switch (state){
+                case 0:
+                    engine.load(null);
+                    break;
+                case 1:
+
+                    break;
+                case 2:
+
+                    break;
+                default:
+            }
         }
     }
 }
