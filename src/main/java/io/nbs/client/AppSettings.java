@@ -440,7 +440,7 @@ public class AppSettings {
      * 是否开启
      */
     public boolean subWorldPeers(){
-        String enabledSunWorldPeers = getConfigVolme("nbs.client.im.topic.subworld","false");
+        String enabledSunWorldPeers = getConfigVolme("nbs.client.im.topic.subworld","true");
         if(enabledSunWorldPeers.equalsIgnoreCase("true") || enabledSunWorldPeers.equals("1")
                 ||enabledSunWorldPeers.equalsIgnoreCase("enabled"))return true;
         return false;

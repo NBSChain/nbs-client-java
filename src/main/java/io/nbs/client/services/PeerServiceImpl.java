@@ -124,7 +124,7 @@ public class PeerServiceImpl {
         List<String> result = null;
         try {
             Object o = null;
-            if(Launcher.appSettings.subWorldPeers()){
+            if(Launcher.appSettings.getStatus("nbs.client.im.topic.subworld-filter")){
                 o = ipfs.pubsub.peers(IpfsMessageSender.NBSWORLD_IMS_TOPIC);
             }else {
                 o = ipfs.pubsub.peers();

@@ -153,7 +153,7 @@ public class ContactsPanel extends ParentAvailablePanel {
 
         try {
             Object obj = null;
-            if(Launcher.appSettings.subWorldPeers()){
+            if(Launcher.appSettings.getStatus("nbs.client.im.topic.subworld-filter")){
                 obj = ipfs.pubsub.peers(IpfsMessageSender.NBSWORLD_IMS_TOPIC);
             }else {
                 obj = ipfs.pubsub.peers();

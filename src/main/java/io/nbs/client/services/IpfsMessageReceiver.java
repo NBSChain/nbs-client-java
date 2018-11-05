@@ -126,7 +126,7 @@ public class IpfsMessageReceiver{
                     if(subscribeListener==null)continue;
                     MessageItem item = IPMParser.convertMessageItem(standardIPFSMessage);
                     item.setMessageType(1);
-                    PeerInfo info =MainFrame.getContext().getCurrentPeer();
+                    PeerInfo info =Launcher.currentPeer;
                     logger.info("{}<=====>{}",info.getId(),item.getFrom());
                     item.setId(UUIDGenerator.getUUID());
                     subscribeListener.notifyRecvMessage(item);

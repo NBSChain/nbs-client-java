@@ -143,13 +143,15 @@ public class Launcher {
             //构建CurrentPeer
             buildPeerInfo(currentPeer,ipfs);
             //bootstrapOk = true;
-            currentFrame = new MainFrame(currentPeer);
             try{
-                fillFromid(ipfs);
+                String enfromid = fillFromid(ipfs);
+                setEnFromid(enfromid);
             }catch (IPFSInitialException iie){
                 //goto Fail
                 goFailFrame(appSettings.getConfigVolme("nbs.ipfs.pubsub.failure.msg","ipfs pubsub service startup fail."));
             }
+            currentFrame = new MainFrame(currentPeer);
+
             hideLoadFrame();
         }catch (RuntimeException re){
             logger.warn("初始化IPFS 失败{}",re.getMessage());
@@ -470,66 +472,53 @@ public class Launcher {
      * @author      : lanbery
      * @Datetime    : 2018/10/22
      * @Description  :
-     * 填充ipfs pubsub fromid
+     * 填充ipfs pubsub enfromid
      */
-    public void fillFromid(IPFS ipfs) throws IPFSInitialException {
-        if(!appSettings.subWorldPeers())return;//未启用聊天模式
+    public String  fillFromid(IPFS ipfs) throws IPFSInitialException {
+        if(!appSettings.subWorldPeers())return null;//未启用聊天模式
         if(ipfs==null)throw new IPFSInitialException("IPFS 服务连接失败.");
         if(currentPeer==null||currentPeer.getId()==null)throw new IPFSInitialException("请先设置IPFS Peer 信息");
-        AtomicBoolean geted = new AtomicBoolean(true);
-        String fromid = "";
-
-        try{
-            //String fromid = ipfs.config.get(ConfigKeys.formid.key());
-            if(StringUtils.isNotBlank(fromid) && !fromid.equalsIgnoreCase("null")){
-                currentPeer.setFrom(fromid);
-                geted.set(false);
-            }else {
-                throw new IOException("no fromid");
-            }
-        }catch (IOException e){
-           //need set ipfs config
-            cycleTryFromid(geted);
-        }catch (RuntimeException re){
-            cycleTryFromid(geted);
-        }finally {
-            if(currentPeer.getFrom()==null)throw new IPFSInitialException("初始化IPFS消息失败.");
-        }
-    }
-
-    private void cycleTryFromid(AtomicBoolean geted){
         int times = Launcher.appSettings.tryGetFromidTimes();
-        AtomicInteger counter = new AtomicInteger(0);//计数器
-        String tmpTopic = RadomCharactersHelper.getInstance().generated(currentPeer.getId(),4);
-        logger.info("get fromid topic : {}",tmpTopic);
-        while (geted.get()){
-            try{
-                Stream<Map<String,Object>> subs = ipfs.pubsub.sub(tmpTopic);
-                ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
-                ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
-                List<Map<String, Object>> lst = subs.limit(1).collect(Collectors.toList());
-                Object fromidObj = JSONParser.getValue(lst.get(0),"from");
-                logger.info(fromidObj.toString());
-                if(fromidObj!=null){
-                    String fromidStr = fromidObj.toString();
-                    String enfromid = Base64CodecUtil.encode(fromidStr);
-                    logger.info("fromid encode compare and set : {} -- {}",fromidStr,enfromid);
-                    ipfs.config.set(ConfigKeys.formid.key(),enfromid);
-                    currentPeer.setFrom(enfromid);
-                    geted.set(false);
-                }
-            }catch (Exception exception){
-                try{
-                    TimeUnit.SECONDS.sleep(2);
-                }catch (InterruptedException ie){
-                }
-                counter.set(counter.get()+1);
-                if(counter.get()>times){
-                    geted.set(false);
-                }
+        AtomicInteger counter = new AtomicInteger(times);
+        return cycleGetFromid(ipfs,counter);
+    }
+
+    /**
+     * @author      : lanbery
+     * @Datetime    : 2018/11/5
+     * @Description  :
+     * return enFromid
+     */
+    private String cycleGetFromid(IPFS ipfs,AtomicInteger counter) throws IPFSInitialException {
+        if(counter==null)return null;
+        if(counter.get()<= 0 )throw new IPFSInitialException("Please check IPFS pubsub enabled.");
+        try{
+            String tmpTopic = RadomCharactersHelper.getInstance().generated(currentPeer.getId(),4);
+            Stream<Map<String,Object>> subs = ipfs.pubsub.sub(tmpTopic);
+            ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
+            ipfs.pubsub.pub(tmpTopic,currentPeer.getId());
+            List<Map<String, Object>> lst = subs.limit(1).collect(Collectors.toList());
+            Object fromidObj = JSONParser.getValue(lst.get(0),"from");
+            logger.info(fromidObj.toString());
+            if(fromidObj!=null){
+                String fromidStr = fromidObj.toString();
+                String enfromid = Base64CodecUtil.encode(fromidStr);
+                logger.info("fromid encode compare and set : {} -- {}",fromidStr,enfromid);
+                ipfs.config.set(ConfigKeys.formid.key(),enfromid);
+                return enfromid;
+            }else {
+                return cycleGetFromid(ipfs,counter);
             }
+        }catch (Exception exception){
+            try{
+                TimeUnit.SECONDS.sleep(2);
+            }catch (InterruptedException ie){
+            }
+            counter.set(counter.get()-1);
+            return cycleGetFromid(ipfs,counter);
         }
     }
+
 
     public ImageIcon getLoading() {
         return loading;
@@ -551,5 +540,11 @@ public class Launcher {
     public Dimension getScreenDimension() {
         return screenDimension;
     }
-    
+
+
+    public static PeerInfo setEnFromid(String enFromid){
+        if(currentPeer==null)currentPeer = new PeerInfo();
+        currentPeer.setFrom(enFromid);
+        return currentPeer;
+    }
 }
