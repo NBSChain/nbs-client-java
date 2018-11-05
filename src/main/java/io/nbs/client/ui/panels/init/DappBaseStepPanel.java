@@ -332,6 +332,9 @@ public class DappBaseStepPanel extends JPanel {
             }
             if(StringUtils.isNotBlank(avatarName))info.setAvatarName(avatarName);
 
+            //处理fromid
+            Launcher.getContext().fillFromid(ipfs);
+
             Launcher.getContext().setCurrentPeer(info);
 
             InitialDappFrame.getContext().dispose();

@@ -2,7 +2,6 @@ package io.ipfs.nbs.helper;
 
 import io.ipfs.api.exceptions.FileFormatUnSupportException;
 import io.ipfs.api.exceptions.IllegalFormatException;
-import io.ipfs.multiaddr.MultiAddress;
 import io.ipfs.multihash.Multihash;
 import io.nbs.client.Launcher;
 import io.nbs.commons.types.FileType;

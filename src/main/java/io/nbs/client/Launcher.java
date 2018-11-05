@@ -142,7 +142,7 @@ public class Launcher {
             ipfs = new IPFS(appSettings.getHost(),appSettings.getApiPort());
             //构建CurrentPeer
             buildPeerInfo(currentPeer,ipfs);
-            bootstrapOk = true;
+            //bootstrapOk = true;
             currentFrame = new MainFrame(currentPeer);
             try{
                 fillFromid(ipfs);
@@ -477,9 +477,10 @@ public class Launcher {
         if(ipfs==null)throw new IPFSInitialException("IPFS 服务连接失败.");
         if(currentPeer==null||currentPeer.getId()==null)throw new IPFSInitialException("请先设置IPFS Peer 信息");
         AtomicBoolean geted = new AtomicBoolean(true);
+        String fromid = "";
 
         try{
-            String fromid = ipfs.config.get(ConfigKeys.formid.key());
+            //String fromid = ipfs.config.get(ConfigKeys.formid.key());
             if(StringUtils.isNotBlank(fromid) && !fromid.equalsIgnoreCase("null")){
                 currentPeer.setFrom(fromid);
                 geted.set(false);
@@ -512,7 +513,7 @@ public class Launcher {
                 if(fromidObj!=null){
                     String fromidStr = fromidObj.toString();
                     String enfromid = Base64CodecUtil.encode(fromidStr);
-                    logger.info("fromid encode compare : {} -- {}",fromidStr,enfromid);
+                    logger.info("fromid encode compare and set : {} -- {}",fromidStr,enfromid);
                     ipfs.config.set(ConfigKeys.formid.key(),enfromid);
                     currentPeer.setFrom(enfromid);
                     geted.set(false);

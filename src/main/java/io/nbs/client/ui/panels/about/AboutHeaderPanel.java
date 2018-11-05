@@ -1,9 +1,9 @@
 package io.nbs.client.ui.panels.about;
 
+import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.ui.components.GBC;
-import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.ParentAvailablePanel;
 import io.nbs.commons.utils.IconUtil;
 
@@ -68,11 +68,11 @@ public class AboutHeaderPanel extends ParentAvailablePanel {
         setLayout(new GridBagLayout());
 
         logoLabel.setIcon(IconUtil.getIcon(this,"/icons/nbs128.png",60,60));
-        String title = AboutMasterPanel.cfgProps.getProperty("nbs.ui.panel.about.label.version-title","The Next Block chain System");
+        String title = Launcher.appSettings.getConfigVolme("nbs.ui.panel.about.label.version-title","The Next Block chain System");
         titleLabel.setText(title);
         titleLabel.setFont(FontUtil.getDefaultFont(32));
         titleLabel.setForeground(ColorCnst.FONT_ABOUT_TITLE_BLUE);
-        String verText =  AboutMasterPanel.cfgProps.getProperty("nbs.ui.panel.about.label.ver-value","v2.0.2");
+        String verText =  Launcher.appSettings.getConfigVolme("nbs.ui.panel.about.label.ver-value","v2.0.2");
         versionLabel.setText(verText);
         versionLabel.setFont(FontUtil.getDefaultFont(12));
 
