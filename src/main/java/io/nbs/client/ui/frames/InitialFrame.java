@@ -17,13 +17,13 @@ import io.nbs.client.cnsts.FontUtil;
 import io.nbs.client.cnsts.OSUtil;
 import io.nbs.client.ui.filters.ImagesFiltFilter;
 import io.nbs.client.helper.AvatarImageHandler;
-import io.nbs.commons.helper.ConfigurationHelper;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.client.ui.components.GBC;
 import io.nbs.client.ui.components.NBSButton;
 import io.nbs.commons.utils.DataBaseUtil;
 import io.nbs.commons.utils.IconUtil;
 import io.nbs.commons.helper.RadomCharactersHelper;
+import io.nbs.sdk.constants.ConfigKeys;
 import io.nbs.sdk.prot.IPMParser;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -440,16 +440,16 @@ public class InitialFrame extends JFrame {
         if(tempInfo==null||tempInfo.getId()==null||StringUtils.isBlank(tempInfo.getFrom()))return false;
         try {
             String nick = IPMParser.urlEncode(tempInfo.getNick());
-            ipfs.config.set(ConfigurationHelper.JSON_NICKNAME_KEY,nick);
+            ipfs.config.set(ConfigKeys.nickname.key(),nick);
             String enFromId =IPMParser.urlEncode(tempInfo.getFrom());
-            ipfs.config.set(ConfigurationHelper.JSON_CFG_FROMID_KEY,enFromId);
-            ipfs.config.set(ConfigurationHelper.JSON_AVATAR_KEY,tempInfo.getAvatar());
-            ipfs.config.set(ConfigurationHelper.JSON_AVATAR_SUFFIX_KEY,tempInfo.getAvatarSuffix());
+            ipfs.config.set(ConfigKeys.formid.key(),enFromId);
+            ipfs.config.set(ConfigKeys.avatarHash.key(),tempInfo.getAvatar());
+            ipfs.config.set(ConfigKeys.avatarSuffix.key(),tempInfo.getAvatarSuffix());
             if(StringUtils.isNotBlank(originAvatarName)){
                 String enFileName =  IPMParser.urlEncode(originAvatarName);
-                ipfs.config.set(ConfigurationHelper.JSON_AVATAR_NAME_KEY,enFileName);
+                ipfs.config.set(ConfigKeys.avatarName.key(),enFileName);
             }
-            Object oFrom = ipfs.config.get(ConfigurationHelper.JSON_CFG_FROMID_KEY) ;
+            Object oFrom = ipfs.config.get(ConfigKeys.formid.key()) ;
             logger.info("peer from={},cfgFrom={}",tempInfo.getFrom(),oFrom.toString());
 
             return true;
