@@ -93,7 +93,6 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
 
         @Override
         public void run() {
-
             root = new Group();
             Scene scene = new Scene(root,this.width,this.height);
             webBrowser.setScene(scene);
