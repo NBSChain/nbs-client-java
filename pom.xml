@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.nbs.lambor</groupId>
     <artifactId>nbs-client4j</artifactId>
-    <version>1.0</version>
+    <version>2.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -109,7 +109,7 @@
     </dependencies>
 
     <build>
-        <finalName>nbs-client4j-2.0</finalName>
+        <finalName>${artifactId}-${version}</finalName>
         <resources>
             <resource>
                 <directory>conf/**</directory>
@@ -236,11 +236,10 @@
                         <platform>windows</platform>
                         <platform>unix</platform>
                     </platforms>
-                    <repositoryName>lib</repositoryName>
                     <programs>
                         <program>
                             <mainClass>${main-class}</mainClass>
-                            <name>nbs-client4j</name>
+                            <name>${artifactId}</name>
                             <jvmSettings>
                                 <extraArguments>
                                     <extraArgument>-Dfile.encoding=utf-8</extraArgument>

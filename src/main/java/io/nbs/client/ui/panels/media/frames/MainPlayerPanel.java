@@ -67,7 +67,11 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
 
     @Override
     public void resize() {
-
+        int cW = browserFrame.currentWindowWidth;
+        int cH = browserFrame.currentWindowHeight - MediaBrowserFrame.TH_SIZE - PlayerStatusPanel.status_H;
+        if(view!=null){
+            view.setPrefSize(new Integer(cW).doubleValue(),new Integer(cH).doubleValue());
+        }
     }
 
     /**
@@ -101,7 +105,7 @@ public class MainPlayerPanel extends JPanel implements WinResizer {
                 @Override
                 public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
                     logger.info("{} loading...{}",url,oldValue.name());
-                    if(oldValue == Worker.State.READY){
+                    if(oldValue == Worker.State.READY || newValue == Worker.State.RUNNING){
                         logger.info("add closed listener ...{}",oldValue.name());
                         if(OSUtil.getOsType() != OSUtil.Mac_OS){
                             JLabel closeLabel = browserFrame.getTitlePanel().getCloseLabel();
