@@ -1,6 +1,7 @@
 package io.nbs.client.adapter;
 
-import com.alibaba.fastjson.JSON;
+import io.ipfs.api.IPFS;
+import io.nbs.client.Launcher;
 import io.nbs.client.vo.ContactsItem;
 import io.nbs.client.ui.holders.AvatarViewHolder;
 import io.nbs.client.ui.panels.im.views.ContactsItemViewHolder;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -32,6 +35,7 @@ public class ContactsItemAdapter extends BaseAdapter<ContactsItemViewHolder> {
     private static final Logger logger = LoggerFactory.getLogger(ContactsItemAdapter.class);
     private List<ContactsItem> contactsItems;
     private List<ContactsItemViewHolder> viewHolders = new ArrayList<>();
+    private static IPFS ipfs = Launcher.getContext().getIpfs();
 
     /**
      * 首拼音
@@ -146,6 +150,21 @@ public class ContactsItemAdapter extends BaseAdapter<ContactsItemViewHolder> {
                         setBackground(holder, Colors.DARK);
                     }
                 }*/
+                String hash58 = item.getId();
+                if(hash58!=null && !hash58.equals(Launcher.getContext().getCurrentPeer().getId())){
+                    logger.info("ping peers {}",hash58);
+                    new Thread(){
+                        @Override
+                        public void run() {
+                            if(ipfs==null)return;
+                            try {
+                                ipfs.ping(hash58);
+                            }catch (IOException ioe){
+                                logger.error(ioe.getMessage());
+                            }
+                        }
+                    }.start();
+                }
             }
 
             @Override
