@@ -61,9 +61,6 @@ public class MediaBrowserFrame extends JFrame {
         initComponents();
         initView();
 
-        //
-        //playerPanel.load(getUrl());
-
     }
 
     private void initComponents(){
@@ -90,7 +87,7 @@ public class MediaBrowserFrame extends JFrame {
 
         this.statusPanel.setBackground(ColorCnst.DARK);
 
-        if(OSUtil.getOsType() != OSUtil.Mac_OS){
+        if(OSUtil.getOsType() == OSUtil.Windows){
             String windows = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
             setUndecorated(true);//隐藏标题栏
             try {
@@ -100,7 +97,7 @@ public class MediaBrowserFrame extends JFrame {
             }
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }else {
-
+            this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         }
 
         this.setIconImage(Launcher.logo.getImage());
@@ -116,11 +113,6 @@ public class MediaBrowserFrame extends JFrame {
         return Launcher.appSettings.getGatewayURL(hash);
     }
 
-    public void loadUrl(){
-        if(this.playerPanel!=null){
-            //this.playerPanel.load(getUrl());
-        }
-    }
 
     /**
      * 居中设置
