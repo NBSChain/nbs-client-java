@@ -55,5 +55,4 @@ public class LCJlabel extends JLabel {
         this.defForeground = ColorCnst.FONT_GRAY;
     }
 
-
 }

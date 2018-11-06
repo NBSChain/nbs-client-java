@@ -1,7 +1,9 @@
 package io.nbs.client.ui.panels.info;
 
+import io.ipfs.nbs.helper.IPAddressHelper;
 import io.ipfs.nbs.helper.IPFSHelper;
 import io.ipfs.api.IPFS;
+import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
 import io.nbs.client.cnsts.FontUtil;
@@ -50,7 +52,6 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
         initView();
 
         setListeners();
-
     }
 
     /**
@@ -101,7 +102,7 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
 
         nickLabel.setHorizontalAlignment(JLabel.LEFT);
 
-        locationLabel.setText(self.getLocations()!=null?self.getLocations():"");
+        //locationLabel.setText(self.getLocations()!=null?self.getLocations():"");
         locationLabel.setHorizontalAlignment(JLabel.LEFT);
 
         JLabel peerIDTtile = new LCJlabel("Peer ID :");
@@ -138,12 +139,4 @@ public class InfoHeaderPanel extends ParentAvailablePanel {
 
     }
 
-
-
-    /**
-     * 更新数据库
-     */
-    private void updatePeers(){
-
-    }
 }

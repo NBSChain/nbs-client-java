@@ -4,6 +4,7 @@ import io.ipfs.IpfsCnst;
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
+import io.ipfs.nbs.helper.IPAddressHelper;
 import io.nbs.client.Launcher;
 import io.nbs.client.cnsts.AppGlobalCnst;
 import io.nbs.client.cnsts.ColorCnst;
@@ -62,6 +63,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
         initComponents();
         initView();
         setListeners();
+        setLoaction();
     }
 
     /**
@@ -73,12 +75,8 @@ public class InfoBodyPanel extends ParentAvailablePanel {
         PeerInfo current = getCurrent();
         String avatarName = current.getAvatarName();
         ImageIcon avatarIcon;
-//        if(StringUtils.isBlank(current.getAvatar())){
-            avatarIcon = IconUtil.getIcon(this,"/images/nbs750.jpg",128,128);
-//        }else {
-//            String avatarPath = AppGlobalCnst.consturactPath(AvatarImageHandler.getAvatarProfileHome(),current.getAvatar()+AvatarImageHandler.AVATAR_SUFFIX);
-//            avatarIcon =  AvatarImageHandler.getInstance().getImageIconFromOrigin(new File(avatarPath),128);
-//        }
+        avatarIcon = IconUtil.getIcon(this,"/images/nbs750.jpg",128,128);
+
         avatarLabel.setIcon(avatarIcon);
         avatarLabel.setBackground(ColorCnst.WINDOW_BACKGROUND_LIGHT);
 
@@ -91,7 +89,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
         String locations = current.getLocations();
         if(StringUtils.isBlank(locations))locations = current.getIp()==null ? "" : current.getIp();
         locationsLabel = new LCJlabel(locations);
-        locationsLabel.setFont(FontUtil.getDefaultFont(20));
+        locationsLabel.setFont(FontUtil.getDefaultFont(13));
         locationsLabel.setHorizontalAlignment(JLabel.CENTER);
 
         //peer
@@ -139,7 +137,7 @@ public class InfoBodyPanel extends ParentAvailablePanel {
     }
 
     private void initView(){
-        setLayout(new VerticalFlowLayout(VerticalFlowLayout.TOP,0,20,true,false));
+        setLayout(new VerticalFlowLayout(VerticalFlowLayout.TOP,0,10,true,false));
         /*=====================================================*/
         avatarLabel.setHorizontalAlignment(JLabel.CENTER);
 
@@ -158,9 +156,9 @@ public class InfoBodyPanel extends ParentAvailablePanel {
         add(nickLabel);
               //  new GBC(0,1).setWeight(1,2).setFill(GBC.HORIZONTAL).setInsets(0,0,0,0));
 
-        add(locationsLabel);
-        add(peerPanel);
 
+        add(peerPanel);
+        add(locationsLabel);
         //
         syncLoadAvatar(getCurrent());
     }
@@ -281,5 +279,34 @@ public class InfoBodyPanel extends ParentAvailablePanel {
             }
             // new Thread(()->{ }).start();
         }
+    }
+
+    /**
+     * 更新数据库
+     */
+    private void setLoaction(){
+        IPAddressHelper addressHelper = IPAddressHelper.getInstance();
+        String host = Launcher.appSettings.getHost();
+        new Thread(){
+
+            @Override
+            public void run() {
+                super.run();
+                StringBuilder sb = new StringBuilder();
+                sb.append("HOST:").append(host);
+                String realIP = addressHelper.getRealIP();
+                if(StringUtils.isNotBlank(realIP)){
+                    sb.append("[").append(realIP).append("]");
+                }
+                String loacation = addressHelper.getLocations(host);
+                if(StringUtils.isNotBlank(loacation)){
+                    sb.append("(").append(loacation).append(")");
+                }
+                locationsLabel.setText(sb.toString());
+                locationsLabel.setVisible(true);
+                context.updateUI();
+                logger.info("INFO >>>>update Host: {}",sb.toString());
+            }
+        }.start();
     }
 }
