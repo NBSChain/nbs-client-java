@@ -8,6 +8,7 @@ import io.nbs.client.ui.components.NbsListView;
 import io.nbs.client.ui.frames.MainFrame;
 import io.nbs.client.ui.panels.im.IMPeersPanel;
 import io.nbs.client.vo.ContactsItem;
+import io.nbs.commons.utils.Base64CodecUtil;
 import io.nbs.sdk.beans.OnlineMessage;
 import io.nbs.sdk.beans.PeerInfo;
 import io.nbs.sdk.beans.SystemCtrlMessageBean;
@@ -102,15 +103,21 @@ public class ContactOnlineAdapter implements OnlineNotifier {
             return 0;
         }
         int i=0;
+        String enfrom = Base64CodecUtil.base64From(item.getFormid());
         for(ContactsItem peer : peerList){
-            if(peer.getId()!=null&&peer.getId().equals(item.getId())&& StringUtils.isNotBlank(peer.getFormid())){
+            if(peer.getId()!=null&&peer.getId().equals(item.getId())){
                 exists = true;
-                peer = item;
+                logger.info("find item {}-{}",peer.getId(),enfrom);
+                peer.setAvatar(item.getAvatar());
+                peer.setName(item.getName());
+                peer.setFormid(enfrom);
+                peer.setAvatarSuffix(item.getAvatarSuffix());
+                peer.setIp(item.getIp());
                 return i;
             }
             i++;
         }
-        peerList.add(item);
+        if(!exists)peerList.add(item);
         return peerList.size()-1;
     }
 
