@@ -172,7 +172,7 @@ public class AvatarUtil {
                             logger.info("avatar download:{}",identify);
                             url = new URL(Launcher.appSettings.getGatewayURL(identify));
                             AvatarImageHandler.getInstance().getFileFromIPFS(url,temCacheFile);
-                            Image nAvatar = ImageIO.read(url);
+                            Image nAvatar = ImageIO.read(temCacheFile);
                             avatarCache.put(identify,nAvatar);
 
                         } catch (MalformedURLException e) {
