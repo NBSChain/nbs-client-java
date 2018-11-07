@@ -48,7 +48,7 @@ public class PeerServiceImpl {
         /**
          * ipfs 获取
          */
-        //TODO
+
 
         return mergeContacts();
         //return init4Test(25);
